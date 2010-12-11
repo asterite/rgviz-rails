@@ -100,7 +100,7 @@ If you need to tweak a result before returning it, just include a block:
 
 You can invoke the rgviz method in your views. {Read more about this}[https://github.com/asterite/rgviz-rails/wiki/Showing-a-visualization-in-a-view].
 
-You can always do it the {old way}[http://code.google.com/apis/visualization/documentation/using_overview.html]. {Read more about this}
+You can always do it the {old way}[http://code.google.com/apis/visualization/documentation/using_overview.html].
 
 === Current Limitations
 * The *format* clause is ignored (If someone knows of a working icu library for ruby, please tell me)
