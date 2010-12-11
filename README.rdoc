@@ -2,7 +2,7 @@
 
 This library makes it easy to implement a Visualization data source so that you can easily chart or visualize your data from ActiveRecord[http://ar.rubyonrails.org/] models. The library implements the {Google Visualization API wire protocol}[http://code.google.com/apis/visualization/documentation/dev/implementing_data_source.html].
 
-It also allows you to render the visualizations in a view template in a very simple but powerful way.
+It also allows you to {render the visualizations in a view template}[https://github.com/asterite/rgviz-rails/wiki/Showing-a-visualization-in-a-view] in a very simple but powerful way.
 
 This library is built on top of rgviz[https://github.com/asterite/rgviz].
 
