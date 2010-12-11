@@ -6,7 +6,7 @@ module Rgviz
         i = 0
         opts.each do |key, value|
           key = key.to_s.gsub('"', '\"')
-           
+
           @s << ',' if i > 0
           @s << "\"#{key}\":"
           if special_keys.include?(key) || !value.kind_of?(String)
@@ -19,9 +19,9 @@ module Rgviz
         end
         @s << '}'
       end
-    
+
       options = options.with_indifferent_access
-    
+
       id = options[:id]
       kind = options[:kind]
       url = options[:url]
@@ -30,74 +30,74 @@ module Rgviz
       html = options[:html] || {}
       hidden = options[:hidden]
       extensions = options[:extensions]
-      
+
       rgviz_events, google_events = events.partition{|x| x.to_s.start_with? 'rgviz'}
       rgviz_events = rgviz_events.inject(Hash.new){|h, y| h[y[0]] = y[1]; h}
       rgviz_events = rgviz_events.with_indifferent_access
-      
+
       html_prefix = (options[:html_prefix] || 'html').to_s
       js_prefix = (options[:js_prefix] || 'js').to_s
       param_prefix = (options[:param_prefix] || 'param').to_s
-      
+
       html_prefix += '_'
       js_prefix += '_'
       param_prefix += '_'
-      
+
       debug = options[:debug]
       opts = options[:options] || {}
       opts[:width] = 640 unless opts[:width]
       opts[:height] = 480 unless opts[:height]
-      
+
       params = []
       uses_rgviz_get_value = false
       uses_rgviz_append = false
-      
+
       visitor = MagicNamesVisitor.new(html_prefix, js_prefix, param_prefix)
-      
+
       special_keys = []
-      
+
       opts.each do |key, value|
         next unless value.kind_of?(String)
-      
+
         source = visitor.get_source(value, false)
         next unless source[:source]
-        
+
         special_keys << key
-        
+
         case source[:source]
         when :html
-          opts[key] = "rgviz_get_value('#{source[:id]}')"      
-          uses_rgviz_get_value = true     
+          opts[key] = "rgviz_get_value('#{source[:id]}')"
+          uses_rgviz_get_value = true
         when :js
           opts[key] = "#{source[:id]}()"
         when :param
           opts[key] = "param_#{source[:id]}"
           params << source[:id].to_i unless params.include?(source[:id])
-        end 
+        end
       end
-      
+
       opts = opts_to_json(opts, special_keys)
-      
+
       raise "Must specify an :id" unless id
       raise "Must specify a :kind" unless kind
       raise "Must specify a :url" unless url
-      
+
       url = url_for url
-      
+
       # Parse the query
       query = Parser.parse query, :extensions => extensions
-      
+
       # And replace the html_ and javascript_ magic names
       query.accept visitor
       query_builder = visitor.query_builder
       query_builder_var = visitor.query_builder_var
-      
+
       uses_rgviz_get_value |= visitor.uses_rgviz_get_value?
       uses_rgviz_append |= visitor.uses_rgviz_append?
-      
+
       visitor.params.each{|p| params << p unless params.include?(p)}
       params = params.sort!.map{|i| "param_#{i}"}
-      
+
       out = ''
 
       # Output the google jsapi tag the first time
@@ -107,15 +107,15 @@ module Rgviz
       end
       # Now the real script
       out << "<script type=\"text/javascript\">\n"
-      
+
       # Define a function to get the value of an html element
-      if uses_rgviz_get_value && !@defined_rgviz_get_value        
+      if uses_rgviz_get_value && !@defined_rgviz_get_value
         out << "function rgviz_get_value(id) {\n"
           out << "var e = document.getElementById(id);\n"
           out << "var n = e.tagName.toLowerCase();\n"
           out << "var s = null;\n"
           out << "if (n == 'select' && e.multiple) {\n"
-            out << "var s = [];\n" 
+            out << "var s = [];\n"
             out << "var o = e.options;\n"
             out << "for(var i = 0; i < o.length; i++)\n"
               out << "if (o[i].selected) s.push(o[i].value);\n"
@@ -128,7 +128,7 @@ module Rgviz
         out << "}\n"
         @defined_rgviz_get_value = true
       end
-        
+
       # Define a function to append the value of a magic something
       if uses_rgviz_append && !@defined_rgviz_append
         out << "function rgviz_append(s, b, a) {\n"
@@ -147,27 +147,27 @@ module Rgviz
         out << "}\n"
         @defined_rgviz_append = true
       end
-      
+
       # Load visualizations and the package, if not already loaded
-      pack = kind.downcase      
+      pack = kind.downcase
       @packages ||= []
       unless @packages.include?(pack)
         out << "google.load(\"visualization\", \"1\", {'packages':['#{pack}']});\n"
         @packages << pack
       end
-      
+
       callback = "rgviz_draw_#{id}"
-      
+
       # Set the callback if the function doesn't have params and if the
       # user didn't request to hide the visualization
       if !hidden && params.empty?
         out << "google.setOnLoadCallback(#{callback});\n"
       end
-      
+
       # Define the visualization var and data
       out << "var rgviz_#{id} = null;\n"
       out << "var rgviz_#{id}_data = null;\n"
-      
+
       # And define the callback
       out << "function #{callback}(#{params.join(', ')}) {\n"
         out << "#{rgviz_events[:rgviz_start]}('#{id}');\n" if rgviz_events[:rgviz_start]
@@ -185,24 +185,28 @@ module Rgviz
           out << "#{rgviz_events[:rgviz_end]}('#{id}');\n" if rgviz_events[:rgviz_end]
         out << "});\n"
       out << "}\n"
-      
+
       out << "</script>\n"
-      
+
       # Write the div
       out << "<div id=\"#{id}\""
       html.each do |key, value|
         out << " #{key}=\"#{h value}\""
       end
       out << "></div>\n"
-      
+
       @first_time = 0
-      
-      out
+
+      if defined? :raw
+        raw out
+      else
+        out
+      end
     end
-    
+
     module_function :rgviz
   end
-  
+
   class MagicNamesVisitor < Visitor
     def initialize(html_prefix, js_prefix, param_prefix)
       @html_prefix = html_prefix
@@ -211,27 +215,27 @@ module Rgviz
       @s = ''
       @params = []
     end
-    
+
     def query_builder
       @s.strip
     end
-    
+
     def query_builder_var
       'q'
     end
-    
+
     def params
       @params
     end
-    
+
     def uses_rgviz_get_value?
       @uses_rgviz_get_value
     end
-    
+
     def uses_rgviz_append?
       @uses_rgviz_append
     end
-    
+
     def visit_query(node)
       @s << "var q = '"
       node.select.accept self if node.select
@@ -241,20 +245,20 @@ module Rgviz
       node.order_by.accept self if node.order_by
       @s << "limit #{node.limit} " if node.limit
       @s << "offset #{node.offset} " if node.offset
-      if node.labels  
+      if node.labels
         @s << "label "
         node.labels.each_with_index do |l, i|
-          @s << ', ' if i > 0 
+          @s << ', ' if i > 0
           l.accept self
         end
-      end 
+      end
       if node.formats
         @s << "format "
         node.formats.each_with_index do |f, i|
-          @s << ', ' if i > 0 
+          @s << ', ' if i > 0
           f.accept self
         end
-      end 
+      end
       if node.options
         @s << "options "
         @s << "no_values " if node.options.no_values
@@ -263,35 +267,35 @@ module Rgviz
       @s << "';\n"
       false
     end
-    
+
     def visit_select(node)
       @s << "select ";
       print_columns node
       @s << " "
       false
     end
-    
+
     def visit_where(node)
       @s << "where "
       node.expression.accept self
       @s << " "
       false
     end
-    
+
     def visit_group_by(node)
       @s << "group by "
       print_columns node
       @s << " "
       false
     end
-    
+
     def visit_pivot(node)
       @s << "pivot "
       print_columns node
       @s << " "
       false
     end
-    
+
     def visit_order_by(node)
       @s << "order by "
       node.sorts.each_with_index do |s, i|
@@ -303,7 +307,7 @@ module Rgviz
       @s << " "
       false
     end
-    
+
     def visit_label(node)
       node.column.accept self
       @s << ' '
@@ -315,7 +319,7 @@ module Rgviz
       end
       false
     end
-    
+
     def visit_format(node)
       node.column.accept self
       @s << ' '
@@ -326,7 +330,7 @@ module Rgviz
       end
       false
     end
-    
+
     def visit_logical_expression(node)
       @s += "("
       node.operands.each_with_index do |operand, i|
@@ -336,9 +340,9 @@ module Rgviz
       @s += ")"
       false
     end
-    
+
     def visit_binary_expression(node)
-      if node.operator == BinaryExpression::Eq 
+      if node.operator == BinaryExpression::Eq
         source = has_magic_name?(node.right)
         if source
           @s << "';\n"
@@ -346,7 +350,7 @@ module Rgviz
           when :html
             @s << "var s = rgviz_get_value('#{source[:id]}');\n"
             append_selections node, source
-            
+
             @uses_rgviz_get_value = true
           when :js
             @s << "var s = #{source[:id]}();\n"
@@ -367,7 +371,7 @@ module Rgviz
       node.right.accept self
       false
     end
-    
+
     def visit_unary_expression(node)
       if node.operator == UnaryExpression::Not
         @s << "not "
@@ -388,7 +392,7 @@ module Rgviz
         append_before_source_type source[:type]
         @s << " + rgviz_get_value('#{source[:id]}') + "
         append_after_source_type source[:type]
-        
+
         @uses_rgviz_get_value = true
       when :js
         append_before_source_type source[:type]
@@ -401,35 +405,35 @@ module Rgviz
         @params << source[:id].to_i unless @params.include?(source[:id])
       end
     end
-    
+
     def visit_number_column(node)
       @s << node.value.to_s
     end
-    
+
     def visit_string_column(node)
       value = node.value.gsub('"', '\"')
       @s << "\"#{value}\""
     end
-    
+
     def visit_boolean_column(node)
       @s << node.value.to_s
     end
-    
+
     def visit_date_column(node)
       @s << "date \"#{node.value.to_s}\""
     end
-    
+
     def visit_date_time_column(node)
       @s << "date \"#{node.value.strftime('%Y-%m-%d %H:%M:%S')}\""
     end
-    
+
     def visit_time_of_day_column(node)
       @s << "date \"#{node.value.strftime('%H:%M:%S')}\""
     end
-    
+
     def visit_scalar_function_column(node)
       case node.function
-      when ScalarFunctionColumn::Sum, ScalarFunctionColumn::Difference, 
+      when ScalarFunctionColumn::Sum, ScalarFunctionColumn::Difference,
            ScalarFunctionColumn::Product, ScalarFunctionColumn::Quotient
         node.arguments[0].accept node
         @s << " #{node.function} "
@@ -444,21 +448,21 @@ module Rgviz
       end
       false
     end
-    
+
     def visit_aggregate_column(node)
       @s << "#{node.function}("
       node.argument.accept self
       @s << ")"
       false
     end
-    
+
     def print_columns(node)
       node.columns.each_with_index do |c, i|
         @s << ', ' if i > 0
         c.accept self
       end
     end
-    
+
     def get_source(name, include_type = true)
       if name.start_with?(@html_prefix)
         if include_type
@@ -482,7 +486,7 @@ module Rgviz
         {}
       end
     end
-    
+
     def get_source_type(source, name)
       if name.start_with?('number_')
         {:source => source, :id => name[7 .. -1], :type => :number}
@@ -498,7 +502,7 @@ module Rgviz
         {:source => source, :id => name, :type => :string}
       end
     end
-    
+
     def append_before_source_type(type)
       case type
       when :number
@@ -513,7 +517,7 @@ module Rgviz
         @s << "timeofday \"'"
       end
     end
-    
+
     def append_after_source_type(type)
       case type
       when :number
@@ -522,7 +526,7 @@ module Rgviz
         @s << "'\""
       end
     end
-    
+
     def append_selections(node, source)
       @s << "q += rgviz_append(s, '";
       node.left.accept self
@@ -533,7 +537,7 @@ module Rgviz
       @s << "');\n"
       @uses_rgviz_append = true
     end
-    
+
     def has_magic_name?(node)
       return false unless node.kind_of?(IdColumn)
       source = get_source node.name
