@@ -197,10 +197,11 @@ module Rgviz
 
       @first_time = 0
 
-      if defined? :raw
-        raw out
-      else
+
+      if Rails::VERSION::MAJOR == 2
         out
+      else
+        raw out
       end
     end
 

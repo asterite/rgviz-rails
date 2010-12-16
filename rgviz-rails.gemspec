@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = "rgviz-rails"
-  s.version = "0.44"
+  s.version = "0.45"
   s.author = "Ary Borenszweig"
   s.email = "aborenszweig@manas.com.ar"
   s.homepage = "http://code.google.com/p/rgviz-rails"
@@ -16,6 +16,7 @@ spec = Gem::Specification.new do |s|
     "lib/rgviz_rails/adapters/postgresql_adapter.rb",
     "lib/rgviz_rails/adapters/sqlite_adapter.rb",
     "lib/rgviz_rails/init.rb",
+    "rails/init.rb",
     "spec/blueprints.rb",
     "spec/spec.opts",
     "spec/spec_helper.rb",
