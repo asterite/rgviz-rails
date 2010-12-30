@@ -9,7 +9,19 @@ module Rgviz
 
           @s << ',' if i > 0
           @s << "\"#{key}\":"
-          if special_keys.include?(key) || !value.kind_of?(String)
+          if value.kind_of? Array
+            @s << '['
+            value.each_with_index do |val, i|
+              @s << ',' if i > 0
+              if val.kind_of? String
+                val = val.gsub('"', '\"')
+                @s << "\"#{val}\""
+              else
+                @s << val.to_s
+              end
+            end
+            @s << ']'
+          elsif special_keys.include?(key) || !value.kind_of?(String)
             @s << value.to_s
           else
             value = value.gsub('"', '\"')
