@@ -351,7 +351,7 @@ module Rgviz
 
     def rails_column_type(col)
       case col.type
-      when :integer
+      when :integer, :float, :decimal
         :number
       else
         col.type
