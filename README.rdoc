@@ -1,6 +1,6 @@
 == Rgviz-rails
 
-This library makes it easy to implement a Visualization data source so that you can easily chart or visualize your data from ActiveRecord[http://ar.rubyonrails.org/] models. The library implements the {Google Visualization API wire protocol}[http://code.google.com/apis/visualization/documentation/dev/implementing_data_source.html].
+This library makes it easy to implement a Visualization data source so that you can easily chart or visualize your data from ActiveRecord[http://ar.rubyonrails.org/] models or from in-memory arrays. The library implements the {Google Visualization API wire protocol}[http://code.google.com/apis/visualization/documentation/dev/implementing_data_source.html].
 
 It also allows you to {render the visualizations in a view template}[https://github.com/asterite/rgviz-rails/wiki/Showing-a-visualization-in-a-view] in a very simple but powerful way.
 
@@ -101,6 +101,21 @@ If you need to tweak a result before returning it, just include a block:
 You can invoke the rgviz method in your views. {Read more about this}[https://github.com/asterite/rgviz-rails/wiki/Showing-a-visualization-in-a-view].
 
 You can always do it the {old way}[http://code.google.com/apis/visualization/documentation/using_overview.html].
+
+=== Executing queries over in-memory arrays
+
+You can also apply a query over an array of arrays that contains your "records" to be queried.
+
+  types = [[:id, :number], [:name, :string], [:age, :number]]
+  records = [
+    [1, 'John', 23],
+    [2, 'Pete', 36]
+  ]
+  executor = Rgviz::MemoryExecutor.new records, types
+
+  render :rgviz => executor
+
+This is very useful if you need to present visualizations against data coming from a CSV file.
 
 === Current Limitations
 * The *format* clause is ignored (If someone knows of a working icu library for ruby, please tell me)
