@@ -1,7 +1,6 @@
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
-require 'spec'
 require 'logger'
 
 require 'active_record'
@@ -40,10 +39,11 @@ require File.dirname(__FILE__) + '/models/country'
 
 require File.dirname(__FILE__) + '/blueprints'
 
-require 'rgviz'
-require 'rgviz_rails'
+require File.dirname(__FILE__) + '/../../rgviz/lib/rgviz'
+#require 'rgviz'
+require 'rgviz_rails/executor'
 
 RAILS_ENV = 'test'
 
 # Add this directory so the ActiveSupport autoloading works
-ActiveSupport::Dependencies.load_paths << File.dirname(__FILE__)
+#ActiveSupport::Dependencies.load_paths << File.dirname(__FILE__)

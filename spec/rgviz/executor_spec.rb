@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-require 'rgviz'
+#require 'rgviz'
 
 include Rgviz
 
@@ -9,8 +9,8 @@ describe Executor do
   end
 
   def exec(query, options = {})
-    exec = Executor.new Person, query
-    exec.execute options
+    exec = Executor.new Person
+    exec.execute query, options
   end
 
   def format_datetime(date)

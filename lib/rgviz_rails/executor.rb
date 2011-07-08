@@ -3,9 +3,8 @@ module Rgviz
     attr_reader :model_class
     attr_reader :adapter
 
-    def initialize(model_class, query)
+    def initialize(model_class)
       @model_class = model_class
-      @query = query
       @selects = []
       @joins = {}
       @labels = {}
@@ -25,7 +24,8 @@ module Rgviz
       end
     end
 
-    def execute(options = {})
+    def execute(query, options = {})
+      @query = query
       @query = Parser.parse(@query, options) unless @query.kind_of?(Query)
 
       @table = Table.new

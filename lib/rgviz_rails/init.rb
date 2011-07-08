@@ -14,17 +14,23 @@ module Rgviz
             model = hash[:rgviz]
             conditions = hash[:conditions]
             extensions = hash[:extensions]
-            query = params[:tq]
+            query = params[:tq] || 'select *'
             tqx = params[:tqx] || ''
 
             tqx = Rgviz::Tqx.parse(tqx)
 
             begin
-              executor = Rgviz::Executor.new model, query
+              if model.is_a? Class and model < ActiveRecord::Base
+                executor = Rgviz::Executor.new model
+              elsif model.respond_to? :execute
+                executor = model
+              else
+                raise "The argument to render :rgviz => ... must extend from ActiveRecord::Base or respond to execute"
+              end
               options = {}
               options[:conditions] = conditions if conditions
               options[:extensions] = extensions if extensions
-              table = executor.execute options
+              table = executor.execute query, options
 
               yield table if block_given?
 
