@@ -118,7 +118,7 @@ You can also apply a query over an array of arrays that contains your "records" 
 This is very useful if you need to present visualizations against data coming from a CSV file.
 
 === Current Limitations
-* The *format* clause is ignored (If someone knows of a working icu library for ruby, please tell me)
+* The *format* clause works, but formatting is as in ruby (like "%.2f" for numbers, "foo %s bar" for strings, and "%Y-%m-%d" for dates, as specified by Time#strftime)
 * Only supports MySQL, PostgreSQL and SQLite adapters
 * These scalar functions are not supported for SQLite: *millisecond*, *quarter*
 * These scalar functions are not supported for MySQL: *millisecond*
