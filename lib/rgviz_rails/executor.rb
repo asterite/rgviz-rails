@@ -15,7 +15,7 @@ module Rgviz
       when 'sqlite'
         require File.dirname(__FILE__) + '/adapters/sqlite_adapter.rb'
         @adapter = SqliteAdapter.new
-      when 'mysql'
+      when 'mysql', 'mysql2'
         require File.dirname(__FILE__) + '/adapters/mysql_adapter.rb'
         @adapter = MySqlAdapter.new
       when 'postgresql'
