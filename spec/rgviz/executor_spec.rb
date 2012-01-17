@@ -14,15 +14,15 @@ describe Executor do
   end
 
   def format_datetime(date)
-    date.strftime "%Y-%m-%d %H:%M:%S"
+    date.strftime "new Date(%Y, %m, %d, %H, %M, %S)"
   end
 
   def format_date(date)
-    date.strftime "%Y-%m-%d"
+    date.strftime "new Date(%Y, %m, %d)"
   end
 
-  def self.it_processes_single_select_column(query, id, type, value, label, options = {})
-    it "processes select #{query}" do
+  def self.it_processes_single_select_column(query, id, type, value, label, options = {}, test_options = {})
+    it "processes select #{query}", test_options do
       if block_given?
         yield
       else
@@ -79,9 +79,9 @@ describe Executor do
   it_processes_single_select_column '"hello"', 'c0', :string, 'hello', "'hello'"
   it_processes_single_select_column 'false', 'c0', :boolean, false, 'false'
   it_processes_single_select_column 'true', 'c0', :boolean, true, 'true'
-  it_processes_single_select_column 'date "2010-01-02"', 'c0', :date, '2010-01-02', "date '2010-01-02'"
-  it_processes_single_select_column 'datetime "2010-01-02 10:11:12"', 'c0', :datetime, '2010-01-02 10:11:12', "datetime '2010-01-02 10:11:12'"
-  it_processes_single_select_column 'timeofday "10:11:12"', 'c0', :timeofday, '10:11:12', "timeofday '10:11:12'"
+  it_processes_single_select_column 'date "2010-01-02"', 'c0', :date, 'new Date(2010, 01, 02)', "date '2010-01-02'"
+  it_processes_single_select_column 'datetime "2010-01-02 10:11:12"', 'c0', :datetime, 'new Date(2010, 01, 02, 10, 11, 12)', "datetime '2010-01-02 10:11:12'"
+  it_processes_single_select_column 'timeofday "10:11:12"', 'c0', :timeofday, 'new Date(0, 0, 0, 10, 11, 12)', "timeofday '10:11:12'"
 
   it_processes_single_select_column '1 + 2', 'c0', :number, 3, '1 + 2'
   it_processes_single_select_column '3 - 2', 'c0', :number, 1, '3 - 2'
@@ -250,9 +250,9 @@ describe Executor do
 #    Person.make :created_at => Time.parse('2006-05-02 3:04:09')
 #  end
 
-  it_processes_single_select_column "toDate('2008-03-13')", 'c0', :date, Date.parse('2008-03-13').to_s, "toDate('2008-03-13')"
+  it_processes_single_select_column "toDate('2008-03-13')", 'c0', :date, "new Date(2008, 03, 13)", "toDate('2008-03-13')"
 
-  it_processes_single_select_column "toDate(created_at)", 'c0', :date, Date.parse('2008-03-13').to_s, "toDate(created_at)" do
+  it_processes_single_select_column "toDate(created_at)", 'c0', :date, "new Date(2008, 03, 13)", "toDate(created_at)" do
     Person.make :created_at => Time.parse('2008-03-13 3:04:09')
   end
 
@@ -300,8 +300,8 @@ describe Executor do
 
     i = 0
     [['c0', :string, 'name'],
-     ['c1', :number, '2000-01-12 sum(age)'],
-     ['c2', :number, '2000-01-13 sum(age)']].each do |id, type, label|
+     ['c1', :number, 'new Date(2000, 01, 12) sum(age)'],
+     ['c2', :number, 'new Date(2000, 01, 13) sum(age)']].each do |id, type, label|
       table.cols[i].id.should == id
       table.cols[i].type.should == type
       table.cols[i].label.should == label
@@ -335,8 +335,8 @@ describe Executor do
     table.cols.length.should == 3
 
     i = 0
-    [['c0', :number, '2000-01-12 sum(age)'],
-     ['c1', :number, '2000-01-13 sum(age)'],
+    [['c0', :number, 'new Date(2000, 01, 12) sum(age)'],
+     ['c1', :number, 'new Date(2000, 01, 13) sum(age)'],
      ['c2', :string, 'name']].each do |id, type, label|
       table.cols[i].id.should == id
       table.cols[i].type.should == type
@@ -386,8 +386,8 @@ describe Executor do
 
     i = 0
     [
-      ['2000-01-12', nil, 1, 10, nil],
-      [nil, '2001-02-12', 2, nil, 20],
+      ['new Date(2000, 01, 12)', nil, 1, 10, nil],
+      [nil, 'new Date(2001, 02, 12)', 2, nil, 20],
     ].each do |values|
       table.rows[i].c.length.should == 5
       values.each_with_index do |v, j|
@@ -459,8 +459,8 @@ describe Executor do
 
     i = 0
     [
-      ['2000-01-12', nil, 10, nil],
-      [nil, '2001-02-12', nil, 20],
+      ['new Date(2000, 01, 12)', nil, 10, nil],
+      [nil, 'new Date(2001, 02, 12)', nil, 20],
     ].each do |values|
       table.rows[i].c.length.should == 4
       values.each_with_index do |v, j|

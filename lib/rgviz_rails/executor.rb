@@ -334,6 +334,15 @@ module Rgviz
         i == f ? i : f
       when :boolean
         value == 1 || value == '1' ? true : false
+      when :date
+        value = Date.parse(value) if value.is_a? String
+        "new Date(#{value.strftime('%Y, %m, %d')})"
+      when :datetime
+        value = DateTime.parse(value) if value.is_a? String
+        "new Date(#{value.strftime('%Y, %m, %d, %H, %M, %S')})"
+      when :timeofday
+        value = DateTime.parse(value) if value.is_a? String
+        "new Date(#{value.strftime('0, 0, 0, %H, %M, %S')})"
       else
         value.to_s
       end
@@ -394,15 +403,15 @@ module Rgviz
     end
 
     def visit_date_column(node)
-      @string += escaped_string(node.value.to_s)
+      @string += "date #{escaped_string(node.value.to_s)}"
     end
 
     def visit_date_time_column(node)
-      @string += escaped_string(node.value.strftime("%Y-%m-%d %H:%M:%S"))
+      @string += "timestamp #{escaped_string(node.value.strftime("%Y-%m-%d %H:%M:%S"))}"
     end
 
     def visit_time_of_day_column(node)
-      @string += escaped_string(node.value.strftime("%H:%M:%S"))
+      @string += "time #{escaped_string(node.value.strftime("%H:%M:%S"))}"
     end
 
     def visit_scalar_function_column(node)

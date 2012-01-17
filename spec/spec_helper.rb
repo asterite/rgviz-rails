@@ -5,8 +5,8 @@ require 'logger'
 
 require 'active_record'
 
-ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-#ActiveRecord::Base.establish_connection(:adapter => 'mysql', :database => 'rgviz_rails', :username => 'root', :password => '###')
+#ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
+ActiveRecord::Base.establish_connection(:adapter => 'mysql2', :database => 'rgviz_rails', :username => 'root', :password => '')
 #ActiveRecord::Base.establish_connection(:adapter => 'postgresql', :database => 'rgviz_rails', :username => 'postgres', :password => '###', :host => '/var/run/postgresql/')
 
 ActiveRecord::Schema.define do
