@@ -335,14 +335,32 @@ module Rgviz
       when :boolean
         value == 1 || value == '1' ? true : false
       when :date
-        value = Date.parse(value) if value.is_a? String
-        "new Date(#{value.strftime('%Y, %m, %d')})"
+        value = Time.parse(value).to_date if value.is_a? String
+        def value.as_json(options = {})
+          self
+        end
+        def value.encode_json(*)
+          "new Date(#{strftime('%Y, %d, %m')})"
+        end
+        value
       when :datetime
-        value = DateTime.parse(value) if value.is_a? String
-        "new Date(#{value.strftime('%Y, %m, %d, %H, %M, %S')})"
+        value = Time.parse(value) if value.is_a? String
+        def value.as_json(*)
+          self
+        end
+        def value.encode_json(*)
+          "new Date(#{strftime('%Y, %d, %m, %H, %M, %S')})"
+        end
+        value
       when :timeofday
-        value = DateTime.parse(value) if value.is_a? String
-        "new Date(#{value.strftime('0, 0, 0, %H, %M, %S')})"
+        value = Time.parse(value) if value.is_a? String
+        def value.as_json(*)
+          self
+        end
+        def value.encode_json(*)
+          "new Date(#{strftime('0, 0, 0, %H, %M, %S')})"
+        end
+        value
       else
         value.to_s
       end
