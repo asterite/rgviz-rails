@@ -251,7 +251,11 @@ module Rgviz
 
     def visit_query(node)
       @s << "var q = '"
-      node.select.accept self if node.select
+      if node.select && node.select.columns && node.select.columns.length > 0
+        node.select.accept self
+      else
+        @s << 'select * '
+      end
       node.where.accept self if node.where
       node.group_by.accept self if node.group_by
       node.pivot.accept self if node.pivot
