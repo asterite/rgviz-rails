@@ -8,6 +8,7 @@ module Rgviz
       @selects = []
       @joins = {}
       @labels = {}
+      @formats = {}
       @pivots = {}
       @group_bys = {}
       @original_columns = []
@@ -33,6 +34,7 @@ module Rgviz
 
       process_pivot
       process_labels
+      process_formats
 
       generate_columns
       generate_conditions
@@ -49,6 +51,14 @@ module Rgviz
 
       @query.labels.each do |label|
         @labels[label.column.to_s] = label.label
+      end
+    end
+
+    def process_formats
+      return unless @query.formats.present?
+
+      @query.formats.each do |format|
+        @formats[format.column.to_s] = format.pattern
       end
     end
 
@@ -182,6 +192,10 @@ module Rgviz
           @table.cols.each do |col|
             hash = {}
             hash[:v] = column_value(col, result.send("c#{i}")) unless @query.options && @query.options.no_values
+
+            format = @formats[@original_columns[i]]
+            hash[:f] = format_value(col, format, hash[:v]) if format
+
             row.c << Cell.new(hash)
             i += 1
           end
@@ -261,6 +275,10 @@ module Rgviz
             if @group_bys.include?(original_column)
               hash = {}
               hash[:v] = key[group_i] unless @query.options && @query.options.no_values
+
+              format = @formats[original_column]
+              hash[:f] = format_value(@table.cols[i], format, hash[:v]) if format
+
               row.c << (Cell.new hash)
               group_i += 1
             elsif !@pivots.include?(original_column)
@@ -270,6 +288,10 @@ module Rgviz
 
                 hash = {}
                 hash[:v] = v unless @query.options && @query.options.no_values
+
+                format = @formats[original_column]
+                hash[:f] = format_value(@table.cols[i], format, hash[:v]) if format
+
                 row.c << (Cell.new hash)
               end
               value_i += 1
@@ -368,6 +390,17 @@ module Rgviz
 
     def column_label(string)
       @labels[string] || string
+    end
+
+    def format_value(col, format, value)
+      return nil if value.nil?
+
+      case col.type
+      when :boolean, :number, :string
+        format % value
+      when :date, :datetime, :timeofday
+        value.strftime(format)
+      end
     end
 
     def to_string(node, visitor_class)

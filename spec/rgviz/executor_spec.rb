@@ -21,7 +21,7 @@ describe Executor do
     date.strftime "new Date(%Y, %m, %d)"
   end
 
-  def self.it_processes_single_select_column(query, id, type, value, label, options = {}, test_options = {})
+  def self.it_processes_single_select_column(query, id, type, value, label, format = nil, options = {}, test_options = {})
     it "processes select #{query}", test_options do
       if block_given?
         yield
@@ -40,6 +40,7 @@ describe Executor do
       table.rows[0].c.length.should == 1
 
       table.rows[0].c[0].v.should == value
+      table.rows[0].c[0].f.should == format
     end
   end
 
@@ -266,11 +267,11 @@ describe Executor do
     Person.make :name => 'FOO'
   end
 
-  it_processes_single_select_column "concat(age)", 'c0', :string, '20', "concat(age)", :extensions => true do
+  it_processes_single_select_column "concat(age)", 'c0', :string, '20', "concat(age)", nil, :extensions => true do
     Person.make :age => 20
   end
 
-  it_processes_single_select_column "concat(name, 'bar')", 'c0', :string, 'foobar', "concat(name, 'bar')", :extensions => true do
+  it_processes_single_select_column "concat(name, 'bar')", 'c0', :string, 'foobar', "concat(name, 'bar')", nil, :extensions => true do
     Person.make :name => 'foo'
   end
 
@@ -470,4 +471,47 @@ describe Executor do
     end
   end
 
+  # Formatting
+  it_processes_single_select_column 'false format false "%s is falsey"', 'c0', :boolean, false, 'false', 'false is falsey'
+  it_processes_single_select_column '1 format 1 "%.2f"', 'c0', :number, 1, '1', '1.00'
+  it_processes_single_select_column '1.2 format 1.2 "%.2f"', 'c0', :number, 1.2, '1.2', '1.20'
+  it_processes_single_select_column '"hello" format "hello" "%s world"', 'c0', :string, "hello", "'hello'", 'hello world'
+  it_processes_single_select_column 'date "2001-01-02" format date "2001-01-02" "%Y"', 'c0', :date, Time.parse('2001-01-02').to_date, "date '2001-01-02'", '2001'
+
+  it "processes pivot with format" do
+    Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 1000
+    Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 500
+    Person.make :name => 'Eng', :birthday => '2000-01-13', :age => 600
+    Person.make :name => 'Sales', :birthday => '2000-01-12', :age => 400
+    Person.make :name => 'Sales', :birthday => '2000-01-12', :age => 350
+    Person.make :name => 'Marketing', :birthday => '2000-01-13', :age => 800
+
+    table = exec 'select name, sum(age) group by name pivot birthday order by name format name "x %s", sum(age) "%.2f"'
+
+    table.cols.length.should == 3
+
+    i = 0
+    [['c0', :string, 'name'],
+     ['c1', :number, '2000-01-12 sum(age)'],
+     ['c2', :number, '2000-01-13 sum(age)']].each do |id, type, label|
+      table.cols[i].id.should == id
+      table.cols[i].type.should == type
+      table.cols[i].label.should == label
+      i += 1
+    end
+
+    table.rows.length.should == 3
+
+    i = 0
+    [[['Eng', 'x Eng'], [1500, '1500.00'], [600, '600.00']],
+     [['Marketing', 'x Marketing'], [nil, nil], [800, '800.00']],
+     [['Sales', 'x Sales'], [750, '750.00'], [nil, nil]]].each do |values|
+      table.rows[i].c.length.should == 3
+      values.each_with_index do |v, j|
+        table.rows[i].c[j].v.should == v[0]
+        table.rows[i].c[j].f.should == v[1]
+      end
+      i += 1
+    end
+  end
 end
