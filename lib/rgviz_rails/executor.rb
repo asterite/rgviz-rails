@@ -275,6 +275,7 @@ module Rgviz
             if @group_bys.include?(original_column)
               hash = {}
               hash[:v] = key[group_i] unless @query.options && @query.options.no_values
+              hash[:v] = 0 if hash[:v].nil? && is_count_column(@query.select.columns[i])
 
               format = @formats[original_column]
               hash[:f] = format_value(@table.cols[i], format, hash[:v]) if format
@@ -288,6 +289,7 @@ module Rgviz
 
                 hash = {}
                 hash[:v] = v unless @query.options && @query.options.no_values
+                hash[:v] = 0 if hash[:v].nil? && is_count_column(@query.select.columns[i])
 
                 format = @formats[original_column]
                 hash[:f] = format_value(@table.cols[i], format, hash[:v]) if format
@@ -299,6 +301,10 @@ module Rgviz
           end
         end
       end
+    end
+
+    def is_count_column(col)
+      col.is_a?(AggregateColumn) && col.function == AggregateColumn::Count
     end
 
     def column_id(col, i)

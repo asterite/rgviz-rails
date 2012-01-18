@@ -471,6 +471,42 @@ describe Executor do
     end
   end
 
+  it "processes pivot with zeros instead of nulls in count", :focus => true do
+    Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 1000
+    Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 500
+    Person.make :name => 'Eng', :birthday => '2000-01-13', :age => 600
+    Person.make :name => 'Sales', :birthday => '2000-01-12', :age => 400
+    Person.make :name => 'Sales', :birthday => '2000-01-12', :age => 350
+    Person.make :name => 'Marketing', :birthday => '2000-01-13', :age => 800
+
+    table = exec 'select name, count(age) group by name pivot birthday order by name'
+
+    table.cols.length.should == 3
+
+    i = 0
+    [['c0', :string, 'name'],
+     ['c1', :number, '2000-01-12 count(age)'],
+     ['c2', :number, '2000-01-13 count(age)']].each do |id, type, label|
+      table.cols[i].id.should == id
+      table.cols[i].type.should == type
+      table.cols[i].label.should == label
+      i += 1
+    end
+
+    table.rows.length.should == 3
+
+    i = 0
+    [['Eng', 2, 1],
+     ['Marketing', 0, 1],
+     ['Sales', 2, 0]].each do |values|
+      table.rows[i].c.length.should == 3
+      values.each_with_index do |v, j|
+        table.rows[i].c[j].v.should == v
+      end
+      i += 1
+    end
+  end
+
   # Formatting
   it_processes_single_select_column 'false format false "%s is falsey"', 'c0', :boolean, false, 'false', 'false is falsey'
   it_processes_single_select_column '1 format 1 "%.2f"', 'c0', :number, 1, '1', '1.00'
