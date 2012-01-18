@@ -1,9 +1,9 @@
 spec = Gem::Specification.new do |s|
   s.name = "rgviz-rails"
-  s.version = "0.50"
+  s.version = "0.51"
   s.author = "Ary Borenszweig"
   s.email = "aborenszweig@manas.com.ar"
-  s.homepage = "http://code.google.com/p/rgviz-rails"
+  s.homepage = "http://github.com/asterite/rgviz-rails"
   s.platform = Gem::Platform::RUBY
   s.summary = "rgviz for rails"
   s.files = [
