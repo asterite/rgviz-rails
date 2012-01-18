@@ -1,6 +1,14 @@
 module Rgviz
   module ViewHelper
     def rgviz(options = {})
+      def get_package(name)
+        down = name.downcase
+        case down
+        when 'gauge', 'geochart', 'table', 'treemap' then down
+        else 'corechart'
+        end
+      end
+
       options = options.with_indifferent_access
 
       id = options[:id]
@@ -138,7 +146,7 @@ module Rgviz
       end
 
       # Load visualizations and the package, if not already loaded
-      pack = kind.downcase
+      pack = get_package kind
       @packages ||= []
       unless @packages.include?(pack)
         out << "google.load(\"visualization\", \"1\", {'packages':['#{pack}']});\n"
