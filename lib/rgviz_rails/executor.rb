@@ -454,15 +454,15 @@ module Rgviz
     end
 
     def visit_date_column(node)
-      @string += "date #{escaped_string(node.value.to_s)}"
+      @executor.adapter.visit_date_column node, self
     end
 
     def visit_date_time_column(node)
-      @string += "timestamp #{escaped_string(node.value.strftime("%Y-%m-%d %H:%M:%S"))}"
+      @executor.adapter.visit_date_time_column node, self
     end
 
     def visit_time_of_day_column(node)
-      @string += "time #{escaped_string(node.value.strftime("%H:%M:%S"))}"
+      @executor.adapter.visit_time_of_day_column node, self
     end
 
     def visit_scalar_function_column(node)

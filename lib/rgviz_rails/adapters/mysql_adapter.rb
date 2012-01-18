@@ -65,5 +65,17 @@ module Rgviz
         visitor << ")"
       end
     end
+
+    def visit_date_column(node, visitor)
+      visitor << "date #{visitor.escaped_string(node.value.strftime("%Y-%m-%d"))}"
+    end
+
+    def visit_date_time_column(node, visitor)
+      visitor << "timestamp #{visitor.escaped_string(node.value.strftime("%Y-%m-%d %H:%M:%S"))}"
+    end
+
+    def visit_time_of_day_column(node, visitor)
+      visitor << "time #{visitor.escaped_string(node.value.strftime("%H:%M:%S"))}"
+    end
   end
 end

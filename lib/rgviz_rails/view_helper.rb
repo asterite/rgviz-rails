@@ -343,7 +343,7 @@ module Rgviz
       if node.pattern.include?("'")
         @s << "\"#{node.pattern}\""
       else
-        @s << "'#{node.pattern}'"
+        @s << "\\'#{node.pattern}\\'"
       end
       false
     end
