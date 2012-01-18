@@ -1,37 +1,6 @@
 module Rgviz
   module ViewHelper
     def rgviz(options = {})
-      def opts_to_json(opts, special_keys)
-        @s = '{'
-        i = 0
-        opts.each do |key, value|
-          key = key.to_s.gsub('"', '\"')
-
-          @s << ',' if i > 0
-          @s << "\"#{key}\":"
-          if value.kind_of? Array
-            @s << '['
-            value.each_with_index do |val, i|
-              @s << ',' if i > 0
-              if val.kind_of? String
-                val = val.gsub('"', '\"')
-                @s << "\"#{val}\""
-              else
-                @s << val.to_s
-              end
-            end
-            @s << ']'
-          elsif special_keys.include?(key) || !value.kind_of?(String)
-            @s << value.to_s
-          else
-            value = value.gsub('"', '\"')
-            @s << "\"#{value}\""
-          end
-          i += 1
-        end
-        @s << '}'
-      end
-
       options = options.with_indifferent_access
 
       id = options[:id]
@@ -66,29 +35,37 @@ module Rgviz
 
       visitor = MagicNamesVisitor.new(html_prefix, js_prefix, param_prefix)
 
-      special_keys = []
-
       opts.each do |key, value|
         next unless value.kind_of?(String)
 
         source = visitor.get_source(value, false)
         next unless source[:source]
 
-        special_keys << key
-
         case source[:source]
         when :html
-          opts[key] = "rgviz_get_value('#{source[:id]}')"
+          s = "rgviz_get_value('#{source[:id]}')"
+          def s.encode_json(options = {})
+            self
+          end
+          opts[key] = s
           uses_rgviz_get_value = true
         when :js
-          opts[key] = "#{source[:id]}()"
+          s = "#{source[:id]}()"
+          def s.encode_json(options = {})
+            self
+          end
+          opts[key] = s
         when :param
-          opts[key] = "param_#{source[:id]}"
+          s = "param_#{source[:id]}"
+          def s.encode_json(options = {})
+            self
+          end
+          opts[key] = s
           params << source[:id].to_i unless params.include?(source[:id])
         end
       end
 
-      opts = opts_to_json(opts, special_keys)
+      opts = opts.to_json
 
       raise "Must specify an :id" unless id
       raise "Must specify a :kind" unless kind
