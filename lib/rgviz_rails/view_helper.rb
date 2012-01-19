@@ -147,12 +147,15 @@ module Rgviz
         @defined_rgviz_append = true
       end
 
-      # Load visualizations and the package, if not already loaded
-      pack = get_package kind
-      @packages ||= []
-      unless @packages.include?(pack)
-        out << "google.load(\"visualization\", \"1\", {'packages':['#{pack}']});\n"
-        @packages << pack
+      if !options.has_key?(:load_package) || options[:load_package]
+        # Load visualizations and the package, if not already loaded
+        pack = get_package kind
+
+        @packages ||= []
+        unless @packages.include?(pack)
+          out << "google.load(\"visualization\", \"1\", {'packages':['#{pack}']});\n"
+          @packages << pack
+        end
       end
 
       callback = "rgviz_draw_#{id}"
