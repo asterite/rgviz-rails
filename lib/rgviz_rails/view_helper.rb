@@ -19,6 +19,7 @@ module Rgviz
       html = options[:html] || {}
       hidden = options[:hidden]
       extensions = options[:extensions]
+      conditions = options[:conditions]
 
       rgviz_events, google_events = events.partition{|x| x[0].to_s.start_with? 'rgviz'}
       rgviz_events = rgviz_events.inject(Hash.new){|h, y| h[y[0]] = y[1]; h}
@@ -79,7 +80,8 @@ module Rgviz
       raise "Must specify a :kind" unless kind
       raise "Must specify a :url" unless url
 
-      url = url_for url
+      custom_executor = (url.is_a?(Class) and url < ActiveRecord::Base) || url.respond_to?(:execute) || url.is_a?(Rgviz::Table)
+      url = url_for url unless custom_executor
 
       # Parse the query
       query = Parser.parse query, :extensions => extensions
@@ -167,21 +169,41 @@ module Rgviz
 
       # And define the callback
       out << "function #{callback}(#{params.join(', ')}) {\n"
-        out << "  #{rgviz_events[:rgviz_start]}('#{id}');\n" if rgviz_events[:rgviz_start]
+      out << "  #{rgviz_events[:rgviz_start]}('#{id}');\n" if rgviz_events[:rgviz_start]
+      unless custom_executor
         out << "  var query = new google.visualization.Query('#{url}');\n"
         out << "  #{query_builder}\n"
         out << "  alert(#{query_builder_var});\n" if debug
         out << "  query.setQuery(#{query_builder_var});\n"
         out << "  query.send(function(response) {\n"
-          out << "    rgviz_#{id} = new google.visualization.#{kind}(document.getElementById('#{id}'));\n"
-          google_events.each do |name, handler|
-            out << "    google.visualization.events.addListener(rgviz_#{id}, '#{name}', #{handler});\n"
-          end
-          out << "    rgviz_#{id}_data = response.getDataTable();\n"
-          out << "    #{rgviz_events[:rgviz_before_draw]}(rgviz_#{id}, rgviz_#{id}_data);\n" if rgviz_events[:rgviz_before_draw]
-          out << "    rgviz_#{id}.draw(rgviz_#{id}_data, #{opts});\n"
-          out << "    #{rgviz_events[:rgviz_end]}('#{id}');\n" if rgviz_events[:rgviz_end]
-        out << "  });\n"
+      end
+      out << "    rgviz_#{id} = new google.visualization.#{kind}(document.getElementById('#{id}'));\n"
+      google_events.each do |name, handler|
+        out << "    google.visualization.events.addListener(rgviz_#{id}, '#{name}', #{handler});\n"
+      end
+
+      if custom_executor
+        executor_options = {}
+        executor_options[:conditions] = conditions if conditions
+        executor_options[:extensions] = extensions if extensions
+
+        table = if url.is_a?(Class) and url < ActiveRecord::Base
+                  Rgviz::Executor.new(url).execute(query, executor_options)
+                elsif url.respond_to?(:execute)
+                  url.execute(query, executor_options)
+                else
+                  url
+                end
+        out << "    rgviz_#{id}_data = new google.visualization.DataTable(#{table.to_json});\n"
+      else
+        out << "    rgviz_#{id}_data = response.getDataTable();\n"
+      end
+      out << "    #{rgviz_events[:rgviz_before_draw]}(rgviz_#{id}, rgviz_#{id}_data);\n" if rgviz_events[:rgviz_before_draw]
+      out << "    rgviz_#{id}.draw(rgviz_#{id}_data, #{opts});\n"
+      out << "    #{rgviz_events[:rgviz_end]}('#{id}');\n" if rgviz_events[:rgviz_end]
+      unless custom_executor
+        out << "});\n"
+      end
       out << "}\n"
 
       out << "</script>\n"

@@ -20,17 +20,19 @@ module Rgviz
             tqx = Rgviz::Tqx.parse(tqx)
 
             begin
-              if model.is_a? Class and model < ActiveRecord::Base
-                executor = Rgviz::Executor.new model
-              elsif model.respond_to? :execute
-                executor = model
-              else
-                raise "The argument to render :rgviz => ... must extend from ActiveRecord::Base or respond to execute"
-              end
               options = {}
               options[:conditions] = conditions if conditions
               options[:extensions] = extensions if extensions
-              table = executor.execute query, options
+
+              table = if model.is_a?(Class) && model < ActiveRecord::Base
+                        Rgviz::Executor.new(model).execute query, options
+                      elsif model.respond_to? :execute
+                        model.execute query, options
+                      elsif model.is_a? Rgviz::Table
+                        model
+                      else
+                        raise "The argument to render :rgviz => ... must extend from ActiveRecord::Base, respond to execute or be an Rgviz::Table"
+                      end
 
               yield table if block_given?
 
