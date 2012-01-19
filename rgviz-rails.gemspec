@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = "rgviz-rails"
-  s.version = "0.54"
+  s.version = "0.55"
   s.author = "Ary Borenszweig"
   s.email = "aborenszweig@manas.com.ar"
   s.homepage = "http://github.com/asterite/rgviz-rails"
