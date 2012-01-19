@@ -20,7 +20,7 @@ module Rgviz
       hidden = options[:hidden]
       extensions = options[:extensions]
 
-      rgviz_events, google_events = events.partition{|x| x.to_s.start_with? 'rgviz'}
+      rgviz_events, google_events = events.partition{|x| x[0].to_s.start_with? 'rgviz'}
       rgviz_events = rgviz_events.inject(Hash.new){|h, y| h[y[0]] = y[1]; h}
       rgviz_events = rgviz_events.with_indifferent_access
 
@@ -167,20 +167,21 @@ module Rgviz
 
       # And define the callback
       out << "function #{callback}(#{params.join(', ')}) {\n"
-        out << "#{rgviz_events[:rgviz_start]}('#{id}');\n" if rgviz_events[:rgviz_start]
-        out << "var query = new google.visualization.Query('#{url}');\n"
-        out << "#{query_builder}\n"
-        out << "alert(#{query_builder_var});\n" if debug
-        out << "query.setQuery(#{query_builder_var});\n"
-        out << "query.send(function(response) {\n"
-          out << "rgviz_#{id} = new google.visualization.#{kind}(document.getElementById('#{id}'));\n"
+        out << "  #{rgviz_events[:rgviz_start]}('#{id}');\n" if rgviz_events[:rgviz_start]
+        out << "  var query = new google.visualization.Query('#{url}');\n"
+        out << "  #{query_builder}\n"
+        out << "  alert(#{query_builder_var});\n" if debug
+        out << "  query.setQuery(#{query_builder_var});\n"
+        out << "  query.send(function(response) {\n"
+          out << "    rgviz_#{id} = new google.visualization.#{kind}(document.getElementById('#{id}'));\n"
           google_events.each do |name, handler|
-            out << "google.visualization.events.addListener(rgviz_#{id}, '#{name}', #{handler});\n"
+            out << "    google.visualization.events.addListener(rgviz_#{id}, '#{name}', #{handler});\n"
           end
-          out << "rgviz_#{id}_data = response.getDataTable();\n"
-          out << "rgviz_#{id}.draw(rgviz_#{id}_data, #{opts});\n"
-          out << "#{rgviz_events[:rgviz_end]}('#{id}');\n" if rgviz_events[:rgviz_end]
-        out << "});\n"
+          out << "    rgviz_#{id}_data = response.getDataTable();\n"
+          out << "    #{rgviz_events[:rgviz_before_draw]}(rgviz_#{id}, rgviz_#{id}_data);\n" if rgviz_events[:rgviz_before_draw]
+          out << "    rgviz_#{id}.draw(rgviz_#{id}_data, #{opts});\n"
+          out << "    #{rgviz_events[:rgviz_end]}('#{id}');\n" if rgviz_events[:rgviz_end]
+        out << "  });\n"
       out << "}\n"
 
       out << "</script>\n"
