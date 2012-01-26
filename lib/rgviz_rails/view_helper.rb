@@ -4,7 +4,7 @@ module Rgviz
       def get_package(name)
         down = name.downcase
         case down
-        when 'gauge', 'geochart', 'table', 'treemap' then down
+        when 'gauge', 'geochart', 'table', 'treemap', 'annotatedtimeline' then down
         else 'corechart'
         end
       end
