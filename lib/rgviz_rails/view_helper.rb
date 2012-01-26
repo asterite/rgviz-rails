@@ -463,9 +463,9 @@ module Rgviz
       case node.function
       when ScalarFunctionColumn::Sum, ScalarFunctionColumn::Difference,
            ScalarFunctionColumn::Product, ScalarFunctionColumn::Quotient
-        node.arguments[0].accept node
+        node.arguments[0].accept self
         @s << " #{node.function} "
-        node.arguments[1].accept node
+        node.arguments[1].accept self
       else
         @s << "#{node.function}("
         node.arguments.each_with_index do |a, i|
