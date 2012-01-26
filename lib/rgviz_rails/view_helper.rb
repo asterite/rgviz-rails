@@ -4,8 +4,10 @@ module Rgviz
       def get_package(name)
         down = name.downcase
         case down
-        when 'gauge', 'geochart', 'table', 'treemap', 'annotatedtimeline' then down
-        else 'corechart'
+        when 'areachart', 'barchart', 'bubblechart', 'candlestickchart',
+          'columnchart', 'combochart', 'linechart', 'piechart',
+          'scatterchart', 'steppedareachart' then 'corechart'
+        else down
         end
       end
 
@@ -20,6 +22,7 @@ module Rgviz
       hidden = options[:hidden]
       extensions = options[:extensions]
       conditions = options[:conditions]
+      package = options[:package]
 
       rgviz_events, google_events = events.partition{|x| x[0].to_s.start_with? 'rgviz'}
       rgviz_events = rgviz_events.inject(Hash.new){|h, y| h[y[0]] = y[1]; h}
@@ -149,12 +152,12 @@ module Rgviz
 
       if !options.has_key?(:load_package) || options[:load_package]
         # Load visualizations and the package, if not already loaded
-        pack = get_package kind
+        package ||= get_package(kind)
 
         @packages ||= []
-        unless @packages.include?(pack)
-          out << "google.load(\"visualization\", \"1\", {'packages':['#{pack}']});\n"
-          @packages << pack
+        unless @packages.include?(package)
+          out << "google.load(\"visualization\", \"1\", {'packages':['#{package}']});\n"
+          @packages << package
         end
       end
 
