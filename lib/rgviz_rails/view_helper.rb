@@ -83,7 +83,7 @@ module Rgviz
       raise "Must specify a :kind" unless kind
       raise "Must specify a :url" unless url
 
-      custom_executor = (url.is_a?(Class) and url < ActiveRecord::Base) || url.respond_to?(:execute) || url.is_a?(Rgviz::Table)
+      custom_executor = (url.is_a?(Class) and url < ActiveRecord::Base) || url.respond_to?(:execute) || url.is_a?(Rgviz::Table) || url.is_a?(Array)
       url = url_for url unless custom_executor
 
       # Parse the query
@@ -189,18 +189,22 @@ module Rgviz
       end
 
       if custom_executor
-        executor_options = {}
-        executor_options[:conditions] = conditions if conditions
-        executor_options[:extensions] = extensions if extensions
+        if url.is_a?(Array)
+          out << "    rgviz_#{id}_data = google.visualization.arrayToDataTable(#{url.to_json});\n"
+        else
+          executor_options = {}
+          executor_options[:conditions] = conditions if conditions
+          executor_options[:extensions] = extensions if extensions
 
-        table = if url.is_a?(Class) and url < ActiveRecord::Base
-                  Rgviz::Executor.new(url).execute(query, executor_options)
-                elsif url.respond_to?(:execute)
-                  url.execute(query, executor_options)
-                else
-                  url
-                end
-        out << "    rgviz_#{id}_data = new google.visualization.DataTable(#{table.to_json});\n"
+          table = if url.is_a?(Class) and url < ActiveRecord::Base
+                    Rgviz::Executor.new(url).execute(query, executor_options)
+                  elsif url.respond_to?(:execute)
+                    url.execute(query, executor_options)
+                  else
+                    url
+                  end
+          out << "    rgviz_#{id}_data = new google.visualization.DataTable(#{table.to_json});\n"
+        end
       else
         out << "    rgviz_#{id}_data = response.getDataTable();\n"
       end
