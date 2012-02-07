@@ -209,7 +209,8 @@ module Rgviz
         out << "    rgviz_#{id}_data = response.getDataTable();\n"
       end
       out << "    #{rgviz_events[:rgviz_before_draw]}(rgviz_#{id}, rgviz_#{id}_data);\n" if rgviz_events[:rgviz_before_draw]
-      out << "    rgviz_#{id}.draw(rgviz_#{id}_data, #{opts});\n"
+      out << "    rgviz_#{id}_options = #{opts};\n"
+      out << "    rgviz_#{id}.draw(rgviz_#{id}_data, rgviz_#{id}_options);\n"
       out << "    #{rgviz_events[:rgviz_end]}('#{id}');\n" if rgviz_events[:rgviz_end]
       unless custom_executor
         out << "});\n"
