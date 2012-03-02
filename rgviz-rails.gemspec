@@ -25,7 +25,8 @@ spec = Gem::Specification.new do |s|
     "spec/models/person.rb",
     "spec/rgviz/executor_spec.rb",
   ]
-  s.add_dependency 'rgviz'
+  s.add_dependency "rgviz"
+  s.add_dependency "rails"
   s.require_path = "lib"
   s.has_rdoc = false
   s.extra_rdoc_files = ["README.rdoc"]
