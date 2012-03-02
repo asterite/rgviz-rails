@@ -287,7 +287,7 @@ describe Executor do
 
   it_processes_single_select_column "1 options no_values", 'c0', :number, nil, "1"
 
-  it_processes_single_select_column '1 where foo_bars_id != 0', 'c0', :number, 1, '1', nil, {:model => Foo}, {:focus => true} do
+  it_processes_single_select_column '1 where foo_bars_id != 0', 'c0', :number, 1, '1', nil, :model => Foo do
     foo = Foo.create!
     FooBar.create! :foo_id => foo.id
   end
