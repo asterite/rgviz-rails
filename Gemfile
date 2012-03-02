@@ -1,7 +1,10 @@
 source :rubygems
 
-gem 'rails'
-gem 'mysql2'
-gem 'machinist', '1.0.6'
-gem 'faker'
-gem 'rspec'
+gemspec
+
+group :development, :test do
+  gem "sqlite3"
+  gem "machinist", "1.0.6"
+  gem "faker"
+  gem "rspec"
+end

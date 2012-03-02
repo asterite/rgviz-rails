@@ -585,17 +585,24 @@ module Rgviz
     while true
       col = klass.send(:columns).select{|x| x.name == name}.first
       return [klass, col, joins] if col
-
+      
+      before = ""
       idx = name.index '_'
-      return nil if not idx
-
-      before = name[0 ... idx]
-      name = name[idx + 1 .. -1]
-
-      assoc = klass.send :reflect_on_association, before.to_sym
-      raise "Unknown association #{before}" unless assoc
-      klass = assoc.klass
-      joins << assoc
+      while idx
+        
+        before += "_" unless before.blank?
+        before += "#{name[0 ... idx]}"
+        name = name[idx + 1 .. -1]
+        assoc = klass.send :reflect_on_association, before.to_sym
+        if assoc
+          klass = assoc.klass
+          joins << assoc
+          idx = nil
+        else
+          idx = name.index '_'
+          raise "Unknown association #{before}" unless idx
+        end
+      end
     end
   end
 
