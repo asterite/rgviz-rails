@@ -585,11 +585,10 @@ module Rgviz
     while true
       col = klass.send(:columns).select{|x| x.name == name}.first
       return [klass, col, joins] if col
-      
+
       before = ""
       idx = name.index '_'
       while idx
-        
         before += "_" unless before.blank?
         before += "#{name[0 ... idx]}"
         name = name[idx + 1 .. -1]

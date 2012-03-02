@@ -9,7 +9,7 @@ describe Executor do
   end
 
   def exec(query, options = {})
-    exec = Executor.new Person
+    exec = Executor.new options[:model] || Person
     exec.execute query, options
   end
 
@@ -287,6 +287,11 @@ describe Executor do
 
   it_processes_single_select_column "1 options no_values", 'c0', :number, nil, "1"
 
+  it_processes_single_select_column '1 where foo_bars_id != 0', 'c0', :number, 1, '1', nil, {:model => Foo}, {:focus => true} do
+    foo = Foo.create!
+    FooBar.create! :foo_id => foo.id
+  end
+
   it "processes pivot" do
     Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 1000
     Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 500
@@ -471,7 +476,7 @@ describe Executor do
     end
   end
 
-  it "processes pivot with zeros instead of nulls in count", :focus => true do
+  it "processes pivot with zeros instead of nulls in count" do
     Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 1000
     Person.make :name => 'Eng', :birthday => '2000-01-12', :age => 500
     Person.make :name => 'Eng', :birthday => '2000-01-13', :age => 600

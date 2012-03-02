@@ -31,11 +31,20 @@ ActiveRecord::Schema.define do
     t.datetime "updated_at"
     t.integer  "city_id"
   end
+
+  create_table "foos", :force => true do |t|
+  end
+
+  create_table "foo_bars", :force => true do |t|
+    t.integer "foo_id"
+  end
 end
 
 require File.dirname(__FILE__) + '/models/person'
 require File.dirname(__FILE__) + '/models/city'
 require File.dirname(__FILE__) + '/models/country'
+require File.dirname(__FILE__) + '/models/foo'
+require File.dirname(__FILE__) + '/models/foo_bar'
 
 require File.dirname(__FILE__) + '/blueprints'
 
