@@ -1,6 +1,11 @@
+# -*- encoding: utf-8 -*-
+$:.push File.expand_path("../lib", __FILE__)
+
+require "rgviz_rails/version"
+
 spec = Gem::Specification.new do |s|
   s.name = "rgviz-rails"
-  s.version = "0.60"
+  s.version = RgvizRails::VERSION
   s.author = "Ary Borenszweig"
   s.email = "aborenszweig@manas.com.ar"
   s.homepage = "http://github.com/asterite/rgviz-rails"
@@ -16,16 +21,10 @@ spec = Gem::Specification.new do |s|
     "lib/rgviz_rails/adapters/postgresql_adapter.rb",
     "lib/rgviz_rails/adapters/sqlite_adapter.rb",
     "lib/rgviz_rails/init.rb",
-    "rails/init.rb",
-    "spec/blueprints.rb",
-    "spec/spec.opts",
-    "spec/spec_helper.rb",
-    "spec/models/city.rb",
-    "spec/models/country.rb",
-    "spec/models/person.rb",
-    "spec/rgviz/executor_spec.rb",
+    "rails/init.rb"
   ]
-  s.add_dependency 'rgviz'
+  s.add_dependency "rgviz"
+  s.add_dependency "rails"
   s.require_path = "lib"
   s.has_rdoc = false
   s.extra_rdoc_files = ["README.rdoc"]
