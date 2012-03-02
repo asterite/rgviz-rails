@@ -1,3 +1,3 @@
 module RgvizRails
-  VERSION = "0.60.1"
+  VERSION = "0.61"
 end
