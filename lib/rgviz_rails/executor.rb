@@ -363,7 +363,9 @@ module Rgviz
       when :boolean
         value == 1 || value == '1' ? true : false
       when :date
-        value = Time.parse(value).to_date if value.is_a? String
+        if value.is_a? String
+          value = Time.zone.nil? ? Time.parse(value).to_date : Time.zone.parse(value).to_date
+        end
         def value.as_json(options = {})
           self
         end
@@ -372,7 +374,9 @@ module Rgviz
         end
         value
       when :datetime
-        value = Time.parse(value) if value.is_a? String
+        if value.is_a? String
+          value = Time.zone.nil? ? Time.parse(value) : Time.zone.parse(value)
+        end
         def value.as_json(*)
           self
         end
@@ -381,7 +385,9 @@ module Rgviz
         end
         value
       when :timeofday
-        value = Time.parse(value) if value.is_a? String
+        if value.is_a? String
+          value = Time.zone.nil? ? Time.parse(value) : Time.zone.parse(value)
+        end
         def value.as_json(*)
           self
         end
