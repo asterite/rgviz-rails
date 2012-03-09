@@ -1,13 +1,13 @@
-$:.unshift(File.dirname(__FILE__) + '/../lib')
+$:.unshift(File.dirname(__FILE__) + "/../lib")
 
-require 'rubygems'
-require 'logger'
+require "rubygems"
+require "logger"
+require "rails/all"
+require "active_record"
 
-require 'active_record'
-
-ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-#ActiveRecord::Base.establish_connection(:adapter => 'mysql2', :database => 'rgviz_rails', :username => 'root', :password => '')
-#ActiveRecord::Base.establish_connection(:adapter => 'postgresql', :database => 'rgviz_rails', :username => 'postgres', :password => '###', :host => '/var/run/postgresql/')
+ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
+#ActiveRecord::Base.establish_connection(:adapter => "mysql2", :database => "rgviz_rails", :username => "root", :password => "")
+#ActiveRecord::Base.establish_connection(:adapter => "postgresql", :database => "rgviz_rails", :username => "postgres", :password => "###", :host => "/var/run/postgresql/")
 
 ActiveRecord::Schema.define do
   create_table "cities", :force => true do |t|
@@ -40,18 +40,15 @@ ActiveRecord::Schema.define do
   end
 end
 
-require File.dirname(__FILE__) + '/models/person'
-require File.dirname(__FILE__) + '/models/city'
-require File.dirname(__FILE__) + '/models/country'
-require File.dirname(__FILE__) + '/models/foo'
-require File.dirname(__FILE__) + '/models/foo_bar'
+require File.dirname(__FILE__) + "/models/person"
+require File.dirname(__FILE__) + "/models/city"
+require File.dirname(__FILE__) + "/models/country"
+require File.dirname(__FILE__) + "/models/foo"
+require File.dirname(__FILE__) + "/models/foo_bar"
 
-require File.dirname(__FILE__) + '/blueprints'
+require File.dirname(__FILE__) + "/blueprints"
 
-require 'rgviz'
-require 'rgviz_rails/executor'
+require "rgviz"
+require "rgviz_rails"
 
-RAILS_ENV = 'test'
-
-# Add this directory so the ActiveSupport autoloading works
-#ActiveSupport::Dependencies.load_paths << File.dirname(__FILE__)
+RAILS_ENV = "test"

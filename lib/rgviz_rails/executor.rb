@@ -27,8 +27,8 @@ module Rgviz
 
     def execute(query, options = {})
       @query = query
-      @query = Parser.parse(@query, options) unless @query.kind_of?(Query)
-
+      @query = RgvizRails::Parser.parse(@query, options) unless @query.kind_of?(Query)
+      
       @table = Table.new
       @extra_conditions = options[:conditions]
 
