@@ -5,5 +5,4 @@ require "rgviz_rails/tqx"
 require "rgviz_rails/parser"
 
 module RgvizRails
-  
 end
