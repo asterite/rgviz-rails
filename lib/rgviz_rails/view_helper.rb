@@ -87,7 +87,7 @@ module Rgviz
       url = url_for url unless custom_executor
 
       # Parse the query
-      query = Parser.parse query, :extensions => extensions
+      query = RgvizRails::Parser.parse query, :extensions => extensions
 
       # And replace the html_ and javascript_ magic names
       query.accept visitor
