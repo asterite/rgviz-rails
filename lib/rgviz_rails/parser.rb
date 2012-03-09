@@ -14,7 +14,7 @@ module RgvizRails
       # formatted as UTC when its used in ActiveRecord. We want the UTC
       # (or system time zone time) time for the given local time.
       if Time.zone
-        time += Time.zone.utc_offset.seconds
+        time -= Time.zone.utc_offset.seconds
       end
       
       time

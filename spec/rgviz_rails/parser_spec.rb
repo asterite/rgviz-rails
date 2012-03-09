@@ -34,7 +34,7 @@ describe RgvizRails::Parser do
         Time.zone = time_zone
         now = Time.now
         parsed = @parser.public_parse_time(now.strftime(@format))
-        (parsed.to_i - now.to_i).should == Time.zone.utc_offset
+        (now.to_i - parsed.to_i).should == Time.zone.utc_offset
       end
       
       it "parses a time string with the Pacific time zone" do
