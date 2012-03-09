@@ -15,6 +15,7 @@ spec = Gem::Specification.new do |s|
     "lib/rgviz_rails.rb",
     "lib/rgviz_rails/executor.rb",
     "lib/rgviz_rails/js_renderer.rb",
+    "lib/rgviz_rails/parser.rb",
     "lib/rgviz_rails/tqx.rb",
     "lib/rgviz_rails/view_helper.rb",
     "lib/rgviz_rails/adapters/mysql_adapter.rb",
