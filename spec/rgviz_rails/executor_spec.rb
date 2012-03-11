@@ -555,4 +555,9 @@ describe Executor do
       i += 1
     end
   end
+
+  it "raises on unknown column" do
+    lambda { exec "select something" }.should raise_exception(Exception, "Unknown column something")
+  end
+
 end

@@ -587,7 +587,7 @@ module Rgviz
       return [klass, col, joins] if col
 
       before = ""
-      idx = name.index '_'
+      idx = name.index('_') or raise "Unknown column #{name}"
       while idx
         before += "_" unless before.blank?
         before += "#{name[0 ... idx]}"
