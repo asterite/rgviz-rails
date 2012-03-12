@@ -51,7 +51,7 @@ module Rgviz
               else
                 render_without_rgviz :text => Rgviz::JsRenderer.render_error('not_supported', "Unsupported output type: #{out}", tqx)
               end
-            rescue ParseException => e
+            rescue Exception => e
               case tqx['out']
               when 'json'
                 render_without_rgviz :text => Rgviz::JsRenderer.render_error('invalid_query', e.message, tqx)
