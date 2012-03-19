@@ -28,7 +28,7 @@ module Rgviz
     def execute(query, options = {})
       @query = query
       @query = RgvizRails::Parser.parse(@query, options) unless @query.kind_of?(Query)
-      
+
       @table = Table.new
       @extra_conditions = options[:conditions]
 
@@ -369,7 +369,7 @@ module Rgviz
         end
         def value.encode_json(*)
           month = strftime("%m").to_i - 1
-          "new Date(#{strftime('%Y,' + month.to_s + ',%d')})"
+          "new Date(#{strftime("%Y,#{month},%d")})"
         end
         value
       when :datetime
@@ -379,7 +379,7 @@ module Rgviz
         end
         def value.encode_json(*)
           month = strftime("%m").to_i - 1
-          "new Date(#{strftime('%Y,' + month.to_s + ',%d,%H,%M,%S')})"
+          "new Date(#{strftime("%Y,#{month},%d,%H,%M,%S")})"
         end
         value
       when :timeofday

@@ -560,4 +560,19 @@ describe Executor do
     lambda { exec "select something" }.should raise_exception(Exception, "Unknown column something")
   end
 
+  context "date formatting" do
+    it "encodes date as json" do
+      executor = Rgviz::Executor.new Person
+      column = Rgviz::Column.new :type => :date
+      value = executor.column_value column, "2012-01-02"
+      value.encode_json.should eq("new Date(2012,0,02)")
+    end
+
+    it "encodes datetime as json" do
+      executor = Rgviz::Executor.new Person
+      column = Rgviz::Column.new :type => :datetime
+      value = executor.column_value column, "2012-01-02 10:11:12"
+      value.encode_json.should eq("new Date(2012,0,02,10,11,12)")
+    end
+  end
 end
