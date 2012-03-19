@@ -368,7 +368,7 @@ module Rgviz
           self
         end
         def value.encode_json(*)
-          month = stftime("%m").to_i - 1
+          month = strftime("%m").to_i - 1
           "new Date(#{strftime('%Y,' + month + ',%d')})"
         end
         value
@@ -378,7 +378,7 @@ module Rgviz
           self
         end
         def value.encode_json(*)
-          month = stftime("%m").to_i - 1
+          month = strftime("%m").to_i - 1
           "new Date(#{strftime('%Y,' + month + ',%d,%H,%M,%S')})"
         end
         value
