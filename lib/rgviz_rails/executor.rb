@@ -556,10 +556,10 @@ module Rgviz
         @string += ')'
       when UnaryExpression::IsNull
         node.operand.accept self
-        @string += 'is null'
+        @string += ' is null'
       when UnaryExpression::IsNotNull
         node.operand.accept self
-        @string += 'is not null'
+        @string += ' is not null'
       end
       false
     end
