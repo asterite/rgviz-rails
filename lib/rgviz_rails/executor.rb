@@ -163,7 +163,7 @@ module Rgviz
         if conditions
           if @extra_conditions.kind_of? String
             conditions = "(#{conditions}) AND #{@extra_conditions}"
-          elsif @extra_conditions.kind_of? Array
+          elsif @extra_conditions.kind_of?(Array) && !@extra_conditions.empty?
             conditions = ["(#{conditions}) AND #{@extra_conditions[0]}", *@extra_conditions[1 .. -1]]
           end
         else

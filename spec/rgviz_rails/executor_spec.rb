@@ -233,6 +233,18 @@ describe Executor do
     table.rows[0].c[0].v.should == 2
   end
 
+  it "processes with conditions as empty array and another filter" do
+    Person.make :age => 1
+    Person.make :age => 2
+    Person.make :age => 3
+
+    table = exec 'select age where age > 2', :conditions => []
+
+    table.rows.length.should == 1
+    table.rows[0].c.length.should == 1
+    table.rows[0].c[0].v.should == 3
+  end
+
   [['year', 2006], ['month', 5], ['day', 2],
    ['hour', 3], ['minute', 4], ['second', 9],
    ['dayOfWeek', 3]].each do |str, val|
