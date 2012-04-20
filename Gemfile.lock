@@ -3,7 +3,7 @@ PATH
   specs:
     rgviz-rails (0.67)
       rails
-      rgviz (>= 0.43)
+      rgviz (>= 0.45)
 
 GEM
   remote: http://rubygems.org/
