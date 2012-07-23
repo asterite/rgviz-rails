@@ -14,6 +14,7 @@ module Rgviz
             model = hash[:rgviz]
             conditions = hash[:conditions]
             extensions = hash[:extensions]
+            virtual_columns = hash[:virtual_columns]
             query = params[:tq] || 'select *'
             tqx = params[:tqx] || ''
 
@@ -23,6 +24,7 @@ module Rgviz
               options = {}
               options[:conditions] = conditions if conditions
               options[:extensions] = extensions if extensions
+              options[:virtual_columns] = virtual_columns if virtual_columns
 
               table = if model.is_a?(Class) && model < ActiveRecord::Base
                         Rgviz::Executor.new(model).execute query, options
