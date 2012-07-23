@@ -5,6 +5,7 @@ include Rgviz
 
 describe Executor do
   before :each do
+    Time.zone = "Greenwich"
     [Person, City, Country].each &:delete_all
   end
 
