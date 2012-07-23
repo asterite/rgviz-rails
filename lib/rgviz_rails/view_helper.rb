@@ -20,7 +20,6 @@ module Rgviz
       events = options[:events] || {}
       html = options[:html] || {}
       hidden = options[:hidden]
-      extensions = options[:extensions]
       conditions = options[:conditions]
       virtual_columns = options[:virtual_columns]
       package = options[:package]
@@ -92,7 +91,7 @@ module Rgviz
       url = url_for url unless custom_executor
 
       # Parse the query
-      query = RgvizRails::Parser.parse query, :extensions => extensions
+      query = RgvizRails::Parser.parse query
 
       # And replace the html_ and javascript_ magic names
       query.accept visitor
@@ -199,7 +198,6 @@ module Rgviz
         else
           executor_options = {}
           executor_options[:conditions] = conditions if conditions
-          executor_options[:extensions] = extensions if extensions
           executor_options[:virtual_columns] = virtual_columns if virtual_columns
 
           table = if url.is_a?(Class) and url < ActiveRecord::Base

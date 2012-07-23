@@ -46,13 +46,6 @@ so for example if <tt>person</tt> has <tt>name</tt> and <tt>age</tt>, pointing y
 
 would render the necessary javascript code that implements the google visualization api wire protocol.
 
-extensions
-----------
-
-to enable the extensions defined by rgviz you need to specify it in the render method:
-
-    render :rgviz => person, :extensions => true
-
 associations
 ------------
 

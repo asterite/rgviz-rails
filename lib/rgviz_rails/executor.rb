@@ -28,13 +28,13 @@ module Rgviz
 
     def execute(query, options = {})
       @query = query
-      @query = RgvizRails::Parser.parse(@query, options) unless @query.kind_of?(Query)
+      @query = RgvizRails::Parser.parse(@query) unless @query.kind_of?(Query)
 
       @table = Table.new
       @extra_conditions = options[:conditions]
       @virtual_columns = options[:virtual_columns]
 
-      process_virtual_columns(options)
+      process_virtual_columns
       process_pivot
       process_labels
       process_formats
@@ -49,12 +49,12 @@ module Rgviz
       @table
     end
 
-    def process_virtual_columns(options)
+    def process_virtual_columns
       return unless @virtual_columns
 
       @virtual_columns.each do |key, value|
         if value.is_a?(String) || value[:gql]
-          parser = RgvizRails::Parser.new(value.is_a?(String) ? value : value[:gql], options)
+          parser = RgvizRails::Parser.new(value.is_a?(String) ? value : value[:gql])
           @virtual_columns[key] = {:gql => parser.parse_column}
         end
       end

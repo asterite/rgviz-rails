@@ -1,7 +1,7 @@
 module RgvizRails
   class Parser < Rgviz::Parser
-    def self.parse(string, options = {})
-      new(string, options).parse
+    def self.parse(string)
+      new(string).parse
     end
     
   protected

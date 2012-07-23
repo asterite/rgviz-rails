@@ -283,11 +283,11 @@ describe Executor do
     Person.make :name => 'FOO'
   end
 
-  it_processes_single_select_column "concat(age)", 'c0', :string, '20', "concat(age)", nil, :extensions => true do
+  it_processes_single_select_column "concat(age)", 'c0', :string, '20', "concat(age)" do
     Person.make :age => 20
   end
 
-  it_processes_single_select_column "concat(name, 'bar')", 'c0', :string, 'foobar', "concat(name, 'bar')", nil, :extensions => true do
+  it_processes_single_select_column "concat(name, 'bar')", 'c0', :string, 'foobar', "concat(name, 'bar')" do
     Person.make :name => 'foo'
   end
 
