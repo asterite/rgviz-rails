@@ -2,6 +2,7 @@ module Rgviz
   class Executor
     attr_reader :model_class
     attr_reader :adapter
+    attr_reader :virtual_columns
 
     def initialize(model_class)
       @model_class = model_class
@@ -31,7 +32,9 @@ module Rgviz
 
       @table = Table.new
       @extra_conditions = options[:conditions]
+      @virtual_columns = options[:virtual_columns]
 
+      process_virtual_columns(options)
       process_pivot
       process_labels
       process_formats
@@ -44,6 +47,17 @@ module Rgviz
       generate_rows
 
       @table
+    end
+
+    def process_virtual_columns(options)
+      return unless @virtual_columns
+
+      @virtual_columns.each do |key, value|
+        if value.is_a?(String) || value[:gql]
+          parser = RgvizRails::Parser.new(value.is_a?(String) ? value : value[:gql], options)
+          @virtual_columns[key] = {:gql => parser.parse_column}
+        end
+      end
     end
 
     def process_labels
@@ -319,6 +333,10 @@ module Rgviz
     def column_type(col)
       case col
       when IdColumn
+        if @virtual_columns && (vc = @virtual_columns[col.name])
+          return vc[:gql] ? column_type(vc[:gql]) : vc[:type]
+        end
+
         klass, rails_col, joins = Rgviz::find_rails_col @model_class, col.name
         raise "Unknown column #{col}" unless rails_col
         rails_column_type rails_col
@@ -440,6 +458,15 @@ module Rgviz
     end
 
     def visit_id_column(node)
+      if @executor.virtual_columns && (vc = @executor.virtual_columns[node.name])
+        if vc[:gql]
+          vc[:gql].accept self
+        else
+          @string += vc[:sql]
+        end
+        return
+      end
+
       klass, rails_col, joins = Rgviz::find_rails_col @executor.model_class, node.name
       raise "Unknown column '#{node.name}'" unless rails_col
       @string += ActiveRecord::Base.connection.quote_column_name(klass.table_name)

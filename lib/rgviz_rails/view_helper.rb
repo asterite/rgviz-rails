@@ -22,6 +22,7 @@ module Rgviz
       hidden = options[:hidden]
       extensions = options[:extensions]
       conditions = options[:conditions]
+      virtual_columns = options[:virtual_columns]
       package = options[:package]
 
       rgviz_events, google_events = events.partition{|x| x[0].to_s.start_with? 'rgviz'}
@@ -197,6 +198,7 @@ module Rgviz
           executor_options = {}
           executor_options[:conditions] = conditions if conditions
           executor_options[:extensions] = extensions if extensions
+          executor_options[:virtual_columns] = virtual_columns if virtual_columns
 
           table = if url.is_a?(Class) and url < ActiveRecord::Base
                     Rgviz::Executor.new(url).execute(query, executor_options)
