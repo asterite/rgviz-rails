@@ -29,6 +29,10 @@ module Rgviz
       rgviz_events = rgviz_events.inject(Hash.new){|h, y| h[y[0]] = y[1]; h}
       rgviz_events = rgviz_events.with_indifferent_access
 
+      ajax = options.has_key?(:ajax) && options[:ajax]
+      load_package = !ajax && (!options.has_key?(:load_package) || options[:load_package])
+      load_google = !ajax && (!options.has_key?(:load_google) || options[:load_google])
+
       html_prefix = (options[:html_prefix] || 'html').to_s
       js_prefix = (options[:js_prefix] || 'js').to_s
       param_prefix = (options[:param_prefix] || 'param').to_s
@@ -105,7 +109,7 @@ module Rgviz
 
       # Output the google jsapi tag the first time
       @first_time ||= 1
-      if @first_time == 1
+      if load_google && @first_time == 1
         out << "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n"
       end
       # Now the real script
@@ -153,7 +157,7 @@ module Rgviz
         @defined_rgviz_append = true
       end
 
-      if !options.has_key?(:load_package) || options[:load_package]
+      if load_package
         # Load visualizations and the package, if not already loaded
         package ||= get_package(kind)
 
@@ -168,7 +172,7 @@ module Rgviz
 
       # Set the callback if the function doesn't have params and if the
       # user didn't request to hide the visualization
-      if !hidden && params.empty?
+      if !ajax && !hidden && params.empty?
         out << "google.setOnLoadCallback(#{callback});\n"
       end
 
@@ -220,7 +224,7 @@ module Rgviz
         out << "});\n"
       end
       out << "}\n"
-
+      out << "#{callback}()" if ajax
       out << "</script>\n"
 
       # Write the div
