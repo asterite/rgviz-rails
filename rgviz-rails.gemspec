@@ -28,5 +28,5 @@ spec = Gem::Specification.new do |s|
   s.add_dependency "rails"
   s.require_path = "lib"
   s.has_rdoc = false
-  s.extra_rdoc_files = ["README.rdoc"]
+  s.extra_rdoc_files = ["README.markdown"]
 end
