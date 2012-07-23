@@ -291,6 +291,10 @@ describe Executor do
     Person.make :name => 'foo'
   end
 
+  it_processes_single_select_column 'round(1.2)', 'c0', :number, 1, 'round(1.2)', nil, :extensions => true
+
+  it_processes_single_select_column 'floor(1.2)', 'c0', :number, 1, 'floor(1.2)', nil, :extensions => true
+
   it_processes_single_select_column "name label name 'my name'", 'name', :string, 'foo', "my name" do
     Person.make :name => 'foo'
   end

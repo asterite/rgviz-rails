@@ -509,6 +509,14 @@ module Rgviz
         @string += node.function.to_s
         node.arguments[1].accept self
         @string += ")"
+      when ScalarFunctionColumn::Round
+        @string += "round("
+        node.arguments[0].accept self
+        @string += ")"
+      when ScalarFunctionColumn::Floor
+        @string += "round("
+        node.arguments[0].accept self
+        @string += ")"
       else
         @executor.adapter.accept_scalar_function_column(node, self)
       end

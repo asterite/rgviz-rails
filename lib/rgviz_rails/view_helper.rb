@@ -140,10 +140,12 @@ module Rgviz
         out << "function rgviz_append(s, b, a) {\n"
           out << "var q = '';\n"
           out << "if (s.length == 0) {\n"
-            out << "q += '1 = 2';\n";
+            out << "q += '1 = 2';\n"
+          out << "} else if (s.length == 1 && s[0] == 'rgviz_all') {\n"
+            out << "q += '1 = 1';\n"
           out << "} else {\n"
             out << "if (s.length > 1) q += '(';\n"
-            out << "for(var i = 0; i < s.length; i++) {\n";
+            out << "for(var i = 0; i < s.length; i++) {\n"
               out << "if (i > 0) q += ' or ';\n"
               out << "q += b + s[i] + a;\n"
             out << "}";

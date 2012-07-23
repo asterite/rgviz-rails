@@ -27,9 +27,9 @@ module Rgviz
         node.arguments[0].accept visitor
         visitor << ")"
       when ScalarFunctionColumn::Millisecond
-        raise NotSupported.new("The millisecond function is not supported")
+        raise NotSupported.new("The millisecond function is not supported in SQLite")
       when ScalarFunctionColumn::Quarter
-        raise NotSupported.new("The quarter function is not supported")
+        raise NotSupported.new("The quarter function is not supported in SQLite")
       when ScalarFunctionColumn::DayOfWeek
         visitor << "1 + strftime('%w', "
         node.arguments[0].accept visitor
