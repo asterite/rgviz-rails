@@ -134,6 +134,10 @@ describe Executor do
     Person.make :age => nil, :name => 'b'
   end
 
+  it_processes_single_select_column 'virtual_column', 'virtual_column', :number, 2, 'virtual_column', nil, :virtual_columns => {'virtual_column' => {:sql => 'case 1 when 1 then 2 else 3 end', :type => :number}}
+  it_processes_single_select_column 'virtual_column', 'virtual_column', :number, 3, 'virtual_column', nil, :virtual_columns => {'virtual_column' => {:gql => '1 + 2'}}
+  it_processes_single_select_column 'virtual_column', 'virtual_column', :number, 3, 'virtual_column', nil, :virtual_columns => {'virtual_column' => '1 + 2'}
+
   it "processes group by" do
     Person.make :name => 'one', :age => 1
     Person.make :name => 'one', :age => 2
