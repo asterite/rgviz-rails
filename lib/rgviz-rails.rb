@@ -1,0 +1,1 @@
+require 'rgviz_rails'
