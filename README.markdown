@@ -150,7 +150,7 @@ Note that the keys of the virtual_columns hash must be strings. The value can be
 Current limitations
 -------------------
 
-* the *format* clause works, but formatting is as in ruby (like "%.2f" for numbers, "foo %s bar" for strings, and "%y-%m-%d" for dates, as specified by time#strftime)
+* the *format* clause works, but formatting is as in ruby (like "%.2f" for numbers, "foo %s bar" for strings, and "%y-%m-%d" for dates, as specified by [Time#strftime](http://www.ruby-doc.org/core-1.9.3/Time.html#method-i-strftime))
 * only supports mysql, postgresql and sqlite adapters
 * these scalar functions are not supported for sqlite: *millisecond*, *quarter*
 * these scalar functions are not supported for mysql: *millisecond*
