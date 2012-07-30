@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rgviz-rails (0.69)
+    rgviz-rails (0.71)
       rails
       rgviz (>= 0.46)
 

@@ -388,7 +388,7 @@ module Rgviz
         RgvizRails::datetime(value)
       when :timeofday
         value = Time.parse(value) if value.is_a? String
-        RgvizRails::timeofday(value)
+        RgvizRails::time_of_day(value)
       else
         value.to_s
       end
