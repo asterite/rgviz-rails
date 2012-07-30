@@ -1,4 +1,4 @@
-rgviz-rails
+e
 ===========
 
 This library makes it easy to implement a visualization data source so that you can easily chart or visualize your data from [ActiveRecord](http://ar.rubyonrails.org/) models or from in-memory arrays. the library implements the [Google Visualization API wire protocol](http://code.google.com/apis/visualization/documentation/dev/implementing_data_source.html).
@@ -118,6 +118,32 @@ You can also apply a query over an array of arrays that contains your "records" 
     render :rgviz => executor
 
 This is very useful if you need to present visualizations against data coming from a csv file.
+
+Virtual columns
+---------------
+
+GQL is nice but it's not very powerful (except for the cute pivot clause).
+
+If you need to select columns using complex SQL, you might be able to do it with virtual columns.
+
+For example, in your controller you put:
+
+    render :rgviz => Person, :virtual_columns => {
+        'age_range' => {
+            :sql => "case when age < 20 then 'young' else 'old' end", 
+            :type => :string
+        }
+    }
+
+Then in a query you can do:
+
+select age_range ...
+
+Note that the keys of the virtual_columns hash must be strings. The value can be a hash with :sql and :type key-value pairs (since GQL needs the type of every column), or can be just a string if you want the column to be replaced by another GQL expression. For example:
+
+    render :rgviz => Person, :virtual_columns => {
+        'age_plus_two' => 'age + 2'
+    }
 
 Current limitations
 -------------------
