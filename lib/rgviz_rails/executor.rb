@@ -382,33 +382,13 @@ module Rgviz
         value == 1 || value == '1' ? true : false
       when :date
         value = Time.parse(value).to_date if value.is_a? String
-        def value.as_json(options = {})
-          self
-        end
-        def value.encode_json(*)
-          month = strftime("%m").to_i - 1
-          "new Date(#{strftime("%Y,#{month},%d")})"
-        end
-        value
+        RgvizRails::date(value)
       when :datetime
         value = Time.parse(value) if value.is_a? String
-        def value.as_json(*)
-          self
-        end
-        def value.encode_json(*)
-          month = strftime("%m").to_i - 1
-          "new Date(#{strftime("%Y,#{month},%d,%H,%M,%S")})"
-        end
-        value
+        RgvizRails::datetime(value)
       when :timeofday
         value = Time.parse(value) if value.is_a? String
-        def value.as_json(*)
-          self
-        end
-        def value.encode_json(*)
-          "new Date(#{strftime('0,0,0,%H,%M,%S')})"
-        end
-        value
+        RgvizRails::timeofday(value)
       else
         value.to_s
       end

@@ -5,4 +5,35 @@ require "rgviz_rails/tqx"
 require "rgviz_rails/parser"
 
 module RgvizRails
+  def self.date(date)
+    def date.as_json(options = {})
+      self
+    end
+    def date.encode_json(*)
+      month = strftime("%m").to_i - 1
+      "new Date(#{strftime("%Y,#{month},%d")})"
+    end
+    date
+  end
+
+  def self.datetime(time)
+    def time.as_json(*)
+      self
+    end
+    def time.encode_json(*)
+      month = strftime("%m").to_i - 1
+      "new Date(#{strftime("%Y,#{month},%d,%H,%M,%S")})"
+    end
+    time
+  end
+
+  def self.time_of_day(time)
+    def time.as_json(*)
+      self
+    end
+    def time.encode_json(*)
+      "new Date(#{strftime('0,0,0,%H,%M,%S')})"
+    end
+    time
+  end
 end
