@@ -1,5 +1,7 @@
-e
+rgviz-rails
 ===========
+
+[![Build Status](https://secure.travis-ci.org/asterite/rgviz-rails.png?branch=master)](http://travis-ci.org/asterite/rgviz-rails)
 
 This library makes it easy to implement a visualization data source so that you can easily chart or visualize your data from [ActiveRecord](http://ar.rubyonrails.org/) models or from in-memory arrays. the library implements the [Google Visualization API wire protocol](http://code.google.com/apis/visualization/documentation/dev/implementing_data_source.html).
 
