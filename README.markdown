@@ -20,7 +20,7 @@ Rails 3
 In your gemfile
 
     gem 'rgviz'
-    gem 'rgviz-rails'
+    gem 'rgviz-rails', :require => 'rgviz_rails'
 
 Rails 2.x
 ---------
@@ -28,7 +28,7 @@ Rails 2.x
 In your environment.rb
 
     config.gem "rgviz"
-    config.gem "rgviz-rails"
+    config.gem "rgviz-rails", :require => 'rgviz_rails'
 
 Usage
 -----
