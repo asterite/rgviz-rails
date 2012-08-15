@@ -106,6 +106,13 @@ module Rgviz
 
       out = ''
 
+      # Write the div
+      out << "<div id=\"#{id}\""
+      html.each do |key, value|
+        out << " #{key}=\"#{h value}\""
+      end
+      out << "></div>\n"
+
       # Output the google jsapi tag the first time
       @first_time ||= 1
       if load_google && @first_time == 1
@@ -224,13 +231,6 @@ module Rgviz
       out << "}\n"
       out << "#{callback}()" if ajax
       out << "</script>\n"
-
-      # Write the div
-      out << "<div id=\"#{id}\""
-      html.each do |key, value|
-        out << " #{key}=\"#{h value}\""
-      end
-      out << "></div>\n"
 
       @first_time = 0
 
