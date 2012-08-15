@@ -23,6 +23,7 @@ module Rgviz
       conditions = options[:conditions]
       virtual_columns = options[:virtual_columns]
       package = options[:package]
+      load = options[:load]
 
       rgviz_events, google_events = events.partition{|x| x[0].to_s.start_with? 'rgviz'}
       rgviz_events = rgviz_events.inject(Hash.new){|h, y| h[y[0]] = y[1]; h}
@@ -104,6 +105,8 @@ module Rgviz
       visitor.params.each{|p| params << p unless params.include?(p)}
       params = params.sort!.map{|i| "param_#{i}"}
 
+      callback = "rgviz_draw_#{id}"
+
       out = ''
 
       # Write the div
@@ -115,9 +118,11 @@ module Rgviz
 
       # Output the google jsapi tag the first time
       @first_time ||= 1
-      if load_google && @first_time == 1
+
+      if load != :auto && load_google && @first_time == 1
         out << "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n"
       end
+
       # Now the real script
       out << "<script type=\"text/javascript\">\n"
 
@@ -161,25 +166,6 @@ module Rgviz
           out << "return q;\n"
         out << "}\n"
         @defined_rgviz_append = true
-      end
-
-      if load_package
-        # Load visualizations and the package, if not already loaded
-        package ||= get_package(kind)
-
-        @packages ||= []
-        unless @packages.include?(package)
-          out << "google.load(\"visualization\", \"1\", {'packages':['#{package}']});\n"
-          @packages << package
-        end
-      end
-
-      callback = "rgviz_draw_#{id}"
-
-      # Set the callback if the function doesn't have params and if the
-      # user didn't request to hide the visualization
-      if !ajax && !hidden && params.empty?
-        out << "google.setOnLoadCallback(#{callback});\n"
       end
 
       # Define the visualization var and data
@@ -229,11 +215,43 @@ module Rgviz
         out << "});\n"
       end
       out << "}\n"
+
+      if load != :auto && load_package
+        # Load visualizations and the package, if not already loaded
+        package ||= get_package(kind)
+
+        @packages ||= []
+        unless @packages.include?(package)
+          out << "google.load(\"visualization\", \"1\", {'packages':['#{package}']"
+
+          if load == :dynamic && !ajax && !hidden && params.empty?
+            out << ", 'callback': #{callback}"
+          end
+
+          out << "});\n"
+          @packages << package
+        end
+      end
+
+      # Set the callback if the function doesn't have params and if the
+      # user didn't request to hide the visualization
+      if !load && !ajax && !hidden && params.empty?
+        out << "google.setOnLoadCallback(#{callback});\n"
+      end
+
       out << "#{callback}()" if ajax
+
       out << "</script>\n"
 
-      @first_time = 0
+      if load == :auto && !ajax && !hidden && params.empty?
+        require 'cgi'
 
+        package ||= get_package(kind)
+        autoload = {'modules' => [{'name' => 'visualization', 'version' => '1', 'packages' => ["#{package}"], 'callback' => callback}]}
+        out << "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi?autoload=#{CGI.escape autoload.to_json}\"></script>\n"
+      end
+
+      @first_time = 0
 
       if Rails::VERSION::MAJOR == 2
         out
