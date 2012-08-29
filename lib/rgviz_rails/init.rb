@@ -24,7 +24,7 @@ module Rgviz
               options[:conditions] = conditions if conditions
               options[:virtual_columns] = virtual_columns if virtual_columns
 
-              table = if model.is_a?(Class) && model < ActiveRecord::Base
+              table = if RgvizRails.inherits_from_active_record(model)
                         Rgviz::Executor.new(model).execute query, options
                       elsif model.respond_to? :execute
                         model.execute query, options

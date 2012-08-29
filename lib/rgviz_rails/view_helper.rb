@@ -88,7 +88,7 @@ module Rgviz
       raise "Must specify a :kind" unless kind
       raise "Must specify a :url" unless url
 
-      custom_executor = (url.is_a?(Class) and url < ActiveRecord::Base) || url.respond_to?(:execute) || url.is_a?(Rgviz::Table) || url.is_a?(Array)
+      custom_executor = RgvizRails.inherits_from_active_record(url) || url.respond_to?(:execute) || url.is_a?(Rgviz::Table) || url.is_a?(Array)
       url = url_for url unless custom_executor
 
       # Parse the query
@@ -195,7 +195,7 @@ module Rgviz
           executor_options[:conditions] = conditions if conditions
           executor_options[:virtual_columns] = virtual_columns if virtual_columns
 
-          table = if url.is_a?(Class) and url < ActiveRecord::Base
+          table = if RgvizRails.inherits_from_active_record(url)
                     Rgviz::Executor.new(url).execute(query, executor_options)
                   elsif url.respond_to?(:execute)
                     url.execute(query, executor_options)

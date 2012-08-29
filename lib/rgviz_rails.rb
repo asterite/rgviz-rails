@@ -36,4 +36,8 @@ module RgvizRails
     end
     time
   end
+
+  def self.inherits_from_active_record(obj)
+    (obj.is_a?(Class) && obj < ActiveRecord::Base) || obj.is_a?(ActiveRecord::Relation)
+  end
 end
