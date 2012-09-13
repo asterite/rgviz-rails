@@ -44,7 +44,7 @@ To make a method in your controller be a visualization api endpoint:
 
 So for example if <ttPperson</tt> has <tt>name</tt> and <tt>age</tt>, pointing your browser to:
 
-    http://localhost:3000/viz/person?select name where age > 20 limit 5
+    http://localhost:3000/viz/person?tq=select name where age > 20 limit 5
 
 would render the necessary javascript code that implements the google visualization api wire protocol.
 
