@@ -89,6 +89,10 @@ or also:
 
     render :rgviz => Person, :conditions => 'age > 20'
 
+or (Rails 3 only):
+
+    render :rgviz => Person.where('age > ?', 20)
+
 Preprocessing
 -------------
 
@@ -132,7 +136,7 @@ For example, in your controller you put:
 
     render :rgviz => Person, :virtual_columns => {
         'age_range' => {
-            :sql => "case when age < 20 then 'young' else 'old' end", 
+            :sql => "case when age < 20 then 'young' else 'old' end",
             :type => :string
         }
     }
