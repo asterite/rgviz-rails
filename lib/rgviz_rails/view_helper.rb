@@ -1,16 +1,6 @@
 module Rgviz
   module ViewHelper
     def rgviz(options = {})
-      def get_package(name)
-        down = name.downcase
-        case down
-        when 'areachart', 'barchart', 'bubblechart', 'candlestickchart',
-          'columnchart', 'combochart', 'linechart', 'piechart',
-          'scatterchart', 'steppedareachart' then 'corechart'
-        else down
-        end
-      end
-
       options = options.with_indifferent_access
 
       id = options[:id]
@@ -47,40 +37,12 @@ module Rgviz
       opts[:height] = 480 unless opts[:height]
 
       params = []
-      uses_rgviz_get_value = false
-      uses_rgviz_append = false
+      uses_rgviz_get_value = [false]
+      uses_rgviz_append = [false]
 
       visitor = MagicNamesVisitor.new(html_prefix, js_prefix, param_prefix)
 
-      opts.each do |key, value|
-        next unless value.kind_of?(String)
-
-        source = visitor.get_source(value, false)
-        next unless source[:source]
-
-        case source[:source]
-        when :html
-          s = "rgviz_get_value('#{source[:id]}')"
-          def s.encode_json(options = {})
-            self
-          end
-          opts[key] = s
-          uses_rgviz_get_value = true
-        when :js
-          s = "#{source[:id]}()"
-          def s.encode_json(options = {})
-            self
-          end
-          opts[key] = s
-        when :param
-          s = "param_#{source[:id]}"
-          def s.encode_json(options = {})
-            self
-          end
-          opts[key] = s
-          params << source[:id].to_i unless params.include?(source[:id])
-        end
-      end
+      Rgviz::ViewHelper.process_options opts, params, visitor, uses_rgviz_get_value, uses_rgviz_append
 
       opts = opts.to_json
 
@@ -99,8 +61,8 @@ module Rgviz
       query_builder = visitor.query_builder
       query_builder_var = visitor.query_builder_var
 
-      uses_rgviz_get_value |= visitor.uses_rgviz_get_value?
-      uses_rgviz_append |= visitor.uses_rgviz_append?
+      uses_rgviz_get_value[0] |= visitor.uses_rgviz_get_value?
+      uses_rgviz_append[0] |= visitor.uses_rgviz_append?
 
       visitor.params.each{|p| params << p unless params.include?(p)}
       params = params.sort!.map{|i| "param_#{i}"}
@@ -127,7 +89,7 @@ module Rgviz
       out << "<script type=\"text/javascript\">\n"
 
       # Define a function to get the value of an html element
-      if uses_rgviz_get_value && !@defined_rgviz_get_value
+      if uses_rgviz_get_value[0] && !@defined_rgviz_get_value
         out << "function rgviz_get_value(id) {\n"
           out << "var e = document.getElementById(id);\n"
           out << "var n = e.tagName.toLowerCase();\n"
@@ -148,7 +110,7 @@ module Rgviz
       end
 
       # Define a function to append the value of a magic something
-      if uses_rgviz_append && !@defined_rgviz_append
+      if uses_rgviz_append[0] && !@defined_rgviz_append
         out << "function rgviz_append(s, b, a) {\n"
           out << "var q = '';\n"
           out << "if (s.length == 0) {\n"
@@ -218,7 +180,7 @@ module Rgviz
 
       if load != :auto && load_package
         # Load visualizations and the package, if not already loaded
-        package ||= get_package(kind)
+        package ||= Rgviz::ViewHelper.get_package(kind)
 
         @packages ||= []
         unless @packages.include?(package)
@@ -261,6 +223,67 @@ module Rgviz
     end
 
     module_function :rgviz
+
+    def self.get_package(name)
+      down = name.downcase
+      case down
+      when 'areachart', 'barchart', 'bubblechart', 'candlestickchart',
+        'columnchart', 'combochart', 'linechart', 'piechart',
+        'scatterchart', 'steppedareachart' then 'corechart'
+      else down
+      end
+    end
+
+    def self.process_options(opts, params, visitor, uses_rgviz_get_value, uses_rgviz_append)
+      if opts.is_a?(Array)
+        i = 0
+        opts.each do |value|
+          opts[i] = process_option(value, params, visitor, uses_rgviz_get_value, uses_rgviz_append)
+          i += 1
+        end
+      elsif opts.is_a?(Hash)
+        opts.each do |key, value|
+          opts[key] = process_option(value, params, visitor, uses_rgviz_get_value, uses_rgviz_append)
+        end
+      end
+      opts
+    end
+
+    def self.process_option(value, params, visitor, uses_rgviz_get_value, uses_rgviz_append)
+      if value.is_a?(Hash) || value.is_a?(Array)
+        return process_options value, params, visitor, uses_rgviz_get_value, uses_rgviz_append
+      end
+
+      return value unless value.kind_of?(String)
+
+      source = visitor.get_source(value, false)
+      return value unless source[:source]
+
+      case source[:source]
+      when :html
+        s = "rgviz_get_value('#{source[:id]}')"
+        def s.encode_json(options = {})
+          self
+        end
+        uses_rgviz_get_value[0] = true
+        return s
+      when :js
+        s = "#{source[:id]}()"
+        def s.encode_json(options = {})
+          self
+        end
+        return s
+      when :param
+        s = "param_#{source[:id]}"
+        def s.encode_json(options = {})
+          self
+        end
+        params << source[:id].to_i unless params.include?(source[:id])
+        return s
+      end
+
+      return value
+    end
   end
 
   class MagicNamesVisitor < Visitor
