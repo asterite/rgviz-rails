@@ -208,7 +208,7 @@ module Rgviz
       if load == :auto && !ajax && !hidden && params.empty?
         require 'cgi'
 
-        package ||= get_package(kind)
+        package ||= Rgviz::ViewHelper.get_package(kind)
         autoload = {'modules' => [{'name' => 'visualization', 'version' => '1', 'packages' => ["#{package}"], 'callback' => callback}]}
         out << "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi?autoload=#{CGI.escape autoload.to_json}\"></script>\n"
       end
