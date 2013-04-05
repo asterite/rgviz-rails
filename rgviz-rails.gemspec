@@ -24,7 +24,7 @@ spec = Gem::Specification.new do |s|
     "lib/rgviz_rails/init.rb",
     "rails/init.rb"
   ]
-  s.add_dependency "rgviz", ">=0.46"
+  s.add_dependency "rgviz", ">=0.50"
   s.add_dependency "rails"
   s.require_path = "lib"
   s.has_rdoc = false
