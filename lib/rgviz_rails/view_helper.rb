@@ -82,7 +82,7 @@ module Rgviz
       @first_time ||= 1
 
       if load != :auto && load_google && @first_time == 1
-        out << "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n"
+        out << "<script type=\"text/javascript\" src=\"//www.google.com/jsapi\"></script>\n"
       end
 
       # Now the real script
@@ -210,7 +210,7 @@ module Rgviz
 
         package ||= Rgviz::ViewHelper.get_package(kind)
         autoload = {'modules' => [{'name' => 'visualization', 'version' => '1', 'packages' => ["#{package}"], 'callback' => callback}]}
-        out << "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi?autoload=#{CGI.escape autoload.to_json}\"></script>\n"
+        out << "<script type=\"text/javascript\" src=\"//www.google.com/jsapi?autoload=#{CGI.escape autoload.to_json}\"></script>\n"
       end
 
       @first_time = 0
