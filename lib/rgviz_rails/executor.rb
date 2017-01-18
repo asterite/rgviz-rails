@@ -185,7 +185,8 @@ module Rgviz
         end
       end
 
-      results = @model_class.send :all,
+      results = @model_class.send :find,
+        :all,
         :select => @selects.join(','),
         :conditions => conditions,
         :group => @group,
