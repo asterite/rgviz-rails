@@ -68,7 +68,8 @@ module Rgviz
           render_without_rgviz *args, &block
         end
       end
-      alias_method_chain :render, :rgviz
+       alias_method :render_without_rgviz, :render
+       alias_method :render, :render_with_rgviz
     end
   end
 end
