@@ -4,6 +4,7 @@ require "rubygems"
 require "logger"
 require "rails/all"
 require "active_record"
+require 'active_support/all'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 #ActiveRecord::Base.establish_connection(:adapter => "mysql2", :database => "rgviz_rails", :username => "root", :password => "")
