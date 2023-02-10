@@ -11,7 +11,7 @@ module RgvizRails
     end
     def date.encode_json(*)
       month = strftime("%m").to_i - 1
-      "new Date(#{strftime("%Y,#{month},%d")})"
+      "Date(#{strftime("%Y,#{month},%d")})"
     end
     date
   end
@@ -22,7 +22,7 @@ module RgvizRails
     end
     def time.encode_json(*)
       month = strftime("%m").to_i - 1
-      "new Date(#{strftime("%Y,#{month},%d,%H,%M,%S")})"
+      "Date(#{strftime("%Y,#{month},%d,%H,%M,%S")})"
     end
     time
   end
@@ -32,7 +32,7 @@ module RgvizRails
       self
     end
     def time.encode_json(*)
-      "new Date(#{strftime('0,0,0,%H,%M,%S')})"
+      "Date(#{strftime('0,0,0,%H,%M,%S')})"
     end
     time
   end

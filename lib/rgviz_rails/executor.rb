@@ -185,14 +185,14 @@ module Rgviz
         end
       end
 
-      results = @model_class.send :all,
-        :select => @selects.join(','),
-        :conditions => conditions,
-        :group => @group,
-        :order => @order,
-        :limit => @query.limit,
-        :offset => @query.offset,
-        :joins => @joins
+      results = @model_class
+        .select(@selects.join(','))
+        .where(conditions)
+        .group(@group)
+        .order(@order)
+        .limit(@query.limit)
+        .offset(@query.offset)
+        .left_joins(@joins)
 
       if @pivots.empty? || results.empty?
         @table.cols = @table.cols[0 ... @max_before_pivot_columns] if @pivots.present?
@@ -381,13 +381,14 @@ module Rgviz
       when :boolean
         value == 1 || value == '1' ? true : false
       when :date
-        value = Time.parse(value).to_date if value.is_a? String
+        value = Time.zone.parse(value).to_date if value.is_a? String
         RgvizRails::date(value)
       when :datetime
-        value = Time.parse(value) if value.is_a? String
+        value = Time.zone.parse(value) if value.is_a? String
         RgvizRails::datetime(value)
       when :timeofday
-        value = Time.parse(value) if value.is_a? String
+        value = Time.zone.parse(value) if value.is_a? String
+        puts RgvizRails::time_of_day(value)
         RgvizRails::time_of_day(value)
       else
         value.to_s
