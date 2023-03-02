@@ -38,29 +38,29 @@ module Rgviz
 
               case tqx['out']
               when 'json'
-                render_without_rgviz :text => Rgviz::JsRenderer.render(table, tqx)
+                render_without_rgviz plain: Rgviz::JsRenderer.render(table, tqx)
               when 'html'
-                render_without_rgviz :text => Rgviz::HtmlRenderer.render(table)
+                render_without_rgviz plain: Rgviz::HtmlRenderer.render(table)
               when 'csv'
                 csv_output = Rgviz::CsvRenderer.render(table)
                 if tqx['outFileName']
                   send_data csv_output, :filename => tqx['outFileName'], :type => 'text/csv'
                 else
-                  render_without_rgviz :text => csv_output
+                  render_without_rgviz plain: csv_output
                 end
               else
-                render_without_rgviz :text => Rgviz::JsRenderer.render_error('not_supported', "Unsupported output type: #{out}", tqx)
+                render_without_rgviz plain: Rgviz::JsRenderer.render_error('not_supported', "Unsupported output type: #{out}", tqx)
               end
             rescue Exception => e
               case tqx['out']
               when 'json'
-                render_without_rgviz :text => Rgviz::JsRenderer.render_error('invalid_query', e.message, tqx)
+                render_without_rgviz plain: Rgviz::JsRenderer.render_error('invalid_query', e.message, tqx)
               when 'html'
-                render_without_rgviz :text => "<b>Error:</b> #{e.message}"
+                render_without_rgviz plain: "<b>Error:</b> #{e.message}"
               when 'csv'
-                render_without_rgviz :text => "Error: #{e.message}"
+                render_without_rgviz plain: "Error: #{e.message}"
               else
-                render_without_rgviz :text => "<b>Unsupported output type:</b> #{out}"
+                render_without_rgviz plain: "<b>Unsupported output type:</b> #{out}"
               end
             end
           end
